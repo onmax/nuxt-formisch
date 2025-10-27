@@ -2,87 +2,173 @@
   <UApp>
     <UContainer class="min-h-screen flex items-center justify-center py-8">
       <UCard class="w-full max-w-2xl">
-        <h1 class="text-3xl font-bold mb-2">Profile Form</h1>
-        <p class="text-gray-600 mb-4">Demo: Formisch + Nuxt with server-side validation</p>
+        <h1 class="text-3xl font-bold mb-2">
+          Profile Form
+        </h1>
+        <p class="text-gray-600 mb-4">
+          Demo: Formisch + Nuxt with server-side validation
+        </p>
 
-      <UCard class="mb-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="font-medium text-sm">Validation Mode</p>
-            <p class="text-xs text-gray-500">{{ serverOnlyValidation ? 'Server-only validation' : 'Frontend + Server validation' }}</p>
-          </div>
-          <UToggle v-model="serverOnlyValidation" />
-        </div>
-      </UCard>
-
-      <FForm
-        :of="form"
-        class="space-y-6"
-        :on-submit="(values) => onSubmit(values as ProfileOutput)"
-      >
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <UFormField label="Name" :error="nameField.errors?.[0]">
-            <UInput v-model="nameField.input" />
-          </UFormField>
-
-          <UFormField label="Email" :error="emailField.errors?.[0]">
-            <UInput v-model="emailField.input" type="email" />
-          </UFormField>
-        </div>
-
-        <UFormField label="Role" :error="roleField.errors?.[0]">
-          <USelect v-model="roleField.input" :items="roleOptions" />
-        </UFormField>
-
-        <UFormField label="Experience Level" :error="experienceField.errors?.[0]">
-          <URadioGroup v-model="experienceField.input" :items="experienceOptions" orientation="horizontal" />
-        </UFormField>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <UFormField label="Age" :error="ageField.errors?.[0]">
-            <UInput v-model.number="ageField.input" type="number" />
-          </UFormField>
-
-          <UFormField label="Start Date" :error="startDateField.errors?.[0]">
-            <UInput v-model="startDateField.input" type="date" />
-          </UFormField>
-        </div>
-
-        <UFormField label="Avatar URL (optional)" :error="avatarField.errors?.[0]">
-          <UInput v-model="avatarField.input" type="url" placeholder="https://example.com/avatar.jpg" />
-          <template v-if="avatarField.input" #hint>
-            <div class="flex items-center gap-2">
-              <span>Preview:</span>
-              <img :src="avatarField.input" alt="Avatar preview" class="size-8 rounded-full">
+        <UCard class="mb-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="font-medium text-sm">
+                Validation Mode
+              </p>
+              <p class="text-xs text-gray-500">
+                {{ serverOnlyValidation ? 'Server-only validation' : 'Frontend + Server validation' }}
+              </p>
             </div>
-          </template>
-        </UFormField>
+            <UToggle v-model="serverOnlyValidation" />
+          </div>
+        </UCard>
 
-        <UFormField label="Bio" :error="bioField.errors?.[0]">
-          <UTextarea v-model="bioField.input" :rows="4" />
-        </UFormField>
+        <FForm
+          :of="form"
+          class="space-y-6"
+          :on-submit="(values) => onSubmit(values as ProfileOutput)"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <UFormField
+              label="Name"
+              :error="nameField.errors?.[0]"
+            >
+              <UInput v-model="nameField.input" />
+            </UFormField>
 
-        <UCheckbox v-model="newsletterField.input" label="Subscribe to newsletter" />
+            <UFormField
+              label="Email"
+              :error="emailField.errors?.[0]"
+            >
+              <UInput
+                v-model="emailField.input"
+                type="email"
+              />
+            </UFormField>
+          </div>
 
-        <UButton type="submit" :loading="form.isSubmitting" block>
-          Save Profile
-        </UButton>
-      </FForm>
+          <UFormField
+            label="Role"
+            :error="roleField.errors?.[0]"
+          >
+            <USelect
+              v-model="roleField.input"
+              :items="roleOptions"
+            />
+          </UFormField>
 
-        <UAlert v-if="error" color="red" variant="soft" title="Error!" class="mt-6">
+          <UFormField
+            label="Experience Level"
+            :error="experienceField.errors?.[0]"
+          >
+            <URadioGroup
+              v-model="experienceField.input"
+              :items="experienceOptions"
+              orientation="horizontal"
+            />
+          </UFormField>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <UFormField
+              label="Age"
+              :error="ageField.errors?.[0]"
+            >
+              <UInput
+                v-model.number="ageField.input"
+                type="number"
+              />
+            </UFormField>
+
+            <UFormField
+              label="Start Date"
+              :error="startDateField.errors?.[0]"
+            >
+              <UInput
+                v-model="startDateField.input"
+                type="date"
+              />
+            </UFormField>
+          </div>
+
+          <UFormField
+            label="Avatar URL (optional)"
+            :error="avatarField.errors?.[0]"
+          >
+            <UInput
+              v-model="avatarField.input"
+              type="url"
+              placeholder="https://example.com/avatar.jpg"
+            />
+            <template
+              v-if="avatarField.input"
+              #hint
+            >
+              <div class="flex items-center gap-2">
+                <span>Preview:</span>
+                <img
+                  :src="avatarField.input"
+                  alt="Avatar preview"
+                  class="size-8 rounded-full"
+                >
+              </div>
+            </template>
+          </UFormField>
+
+          <UFormField
+            label="Bio"
+            :error="bioField.errors?.[0]"
+          >
+            <UTextarea
+              v-model="bioField.input"
+              :rows="4"
+            />
+          </UFormField>
+
+          <UCheckbox
+            v-model="newsletterField.input"
+            label="Subscribe to newsletter"
+          />
+
+          <UButton
+            type="submit"
+            :loading="form.isSubmitting"
+            block
+          >
+            Save Profile
+          </UButton>
+        </FForm>
+
+        <UAlert
+          v-if="error"
+          color="error"
+          variant="soft"
+          title="Error!"
+          class="mt-6"
+        >
           <template #description>
             <pre class="text-sm whitespace-pre-wrap">{{ error }}</pre>
           </template>
         </UAlert>
 
-        <UAlert v-if="submitted" color="green" variant="soft" title="Profile saved successfully!" class="mt-6">
+        <UAlert
+          v-if="submitted"
+          color="success"
+          variant="soft"
+          title="Profile saved successfully!"
+          class="mt-6"
+        >
           <template #description>
             <pre class="text-sm whitespace-pre-wrap">{{ JSON.stringify(submittedData, null, 2) }}</pre>
           </template>
         </UAlert>
 
         <div class="mt-6 pt-6 border-t text-center text-sm text-gray-500">
-          <a href="https://github.com/onmax/nuxt-formisch" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors">
+          <a
+            href="https://github.com/onmax/nuxt-formisch"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-blue-600 transition-colors"
+          >
             View on GitHub →
           </a>
         </div>
@@ -101,7 +187,7 @@ const submittedData = ref()
 const error = ref('')
 const serverOnlyValidation = ref(false)
 
-const roleOptions = [{label: 'Developer', value: 'developer'}, {label: 'Designer', value: 'designer'}, {label: 'Product Manager', value: 'manager'}, {label: 'Other', value: 'other'}]
+const roleOptions = [{ label: 'Developer', value: 'developer' }, { label: 'Designer', value: 'designer' }, { label: 'Product Manager', value: 'manager' }, { label: 'Other', value: 'other' }]
 const experienceOptions = ['junior', 'mid', 'senior', 'lead']
 
 const form = useForm({
