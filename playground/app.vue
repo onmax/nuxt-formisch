@@ -176,6 +176,8 @@
 <script setup lang="ts">
 import type { SubmitHandler } from '@formisch/vue'
 
+useHead({ title: 'Formisch + Nuxt Demo' })
+
 // profileSchema is auto-imported
 const submitted = ref(false)
 const submittedData = ref()
