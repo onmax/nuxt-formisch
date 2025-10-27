@@ -1,8 +1,8 @@
 import { resolve } from 'node:path'
-import { $fetch, setup } from '@nuxt/test-utils/e2e'
-import { describe, expect, it } from 'vitest'
+import { describe, it, expect } from 'vitest'
+import { setup, $fetch } from '@nuxt/test-utils/e2e'
 
-describe('profile form validation', async () => {
+describe('Profile form validation', async () => {
   await setup({
     rootDir: resolve(__dirname, '..'),
     server: true,

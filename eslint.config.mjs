@@ -1,18 +1,27 @@
 // @ts-check
-import antfu from '@antfu/eslint-config'
-import withNuxt from './playground/.nuxt/eslint.config.mjs'
+import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 
-export default withNuxt(
-  antfu({
+// Run `npx @eslint/config-inspector` to inspect the resolved config interactively
+export default createConfigForNuxt({
+  features: {
+    // Rules for module authors
+    tooling: true,
+    // Rules for formatting
     stylistic: true,
-    ignores: [
-      '.nuxt',
-      '.output',
-      'dist',
-      'node_modules',
-      'playground/.nuxt',
-      'playground/.output',
-      'playground/dist',
+  },
+  dirs: {
+    src: [
+      './playground',
     ],
-  }),
-)
+  },
+}).prepend({
+  ignores: [
+    '.nuxt',
+    '.output',
+    'dist',
+    'node_modules',
+    'playground/.nuxt',
+    'playground/.output',
+    'playground/dist',
+  ],
+})

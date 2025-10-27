@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url'
-import { $fetch, setup } from '@nuxt/test-utils/e2e'
-import { describe, expect, it } from 'vitest'
+import { describe, it, expect } from 'vitest'
+import { setup, $fetch } from '@nuxt/test-utils/e2e'
 
 describe('formisch module', async () => {
   await setup({

@@ -1,10 +1,10 @@
 {
   "name": "nuxt-formisch",
-  "type": "module",
   "version": "0.0.1",
   "description": "Formisch integration for Nuxt - schema-based, headless form library",
-  "license": "MIT",
   "repository": "formisch/nuxt",
+  "license": "MIT",
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/types.d.mts",
@@ -34,17 +34,15 @@
     "test:watch": "vitest watch",
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
-  "peerDependencies": {
-    "valibot": ">=1.0.0"
-  },
   "dependencies": {
     "@formisch/vue": "^0.4.0",
     "@nuxt/kit": "^4.2.0"
   },
+  "peerDependencies": {
+    "valibot": ">=1.0.0"
+  },
   "devDependencies": {
-    "@antfu/eslint-config": "^6.1.0",
     "@nuxt/devtools": "^2.6.5",
-    "@nuxt/eslint": "^1.9.0",
     "@nuxt/eslint-config": "^1.9.0",
     "@nuxt/module-builder": "^1.0.2",
     "@nuxt/schema": "^4.2.0",

@@ -1,58 +1,3 @@
-<script setup lang="ts">
-import type { SubmitHandler } from '@formisch/vue'
-
-useHead({ title: 'Formisch + Nuxt Demo' })
-
-// profileSchema is auto-imported
-const submitted = ref(false)
-const submittedData = ref()
-const error = ref('')
-
-const form = useForm({
-  schema: profileSchema,
-  initialValues: {
-    name: 'John Doe',
-    email: 'john@example.com',
-    role: 'developer' as const,
-    experience: 'mid' as const,
-    age: 25,
-    startDate: '2024-01-15',
-    avatar: 'https://i.pravatar.cc/150?img=68',
-    bio: 'I love building forms with Formisch!',
-    newsletter: true,
-  },
-})
-
-const nameField = useField(() => form, () => ({ path: ['name'] as const }))
-const emailField = useField(() => form, () => ({ path: ['email'] as const }))
-const roleField = useField(() => form, () => ({ path: ['role'] as const }))
-const experienceField = useField(() => form, () => ({ path: ['experience'] as const }))
-const ageField = useField(() => form, () => ({ path: ['age'] as const }))
-const startDateField = useField(() => form, () => ({ path: ['startDate'] as const }))
-const avatarField = useField(() => form, () => ({ path: ['avatar'] as const }))
-const bioField = useField(() => form, () => ({ path: ['bio'] as const }))
-const newsletterField = useField(() => form, () => ({ path: ['newsletter'] as const }))
-
-const onSubmit: SubmitHandler<typeof profileSchema> = async (values) => {
-  try {
-    error.value = ''
-    submitted.value = false
-    const response = await $fetch('/api/login', { method: 'POST', body: values })
-    submittedData.value = response
-    submitted.value = true
-  }
-  catch (e) {
-    if (e && typeof e === 'object' && 'data' in e) {
-      const data = e.data as { errors?: Record<string, string> }
-      error.value = data.errors ? JSON.stringify(data.errors) : 'Submission failed'
-    }
-    else {
-      error.value = 'Submission failed'
-    }
-  }
-}
-</script>
-
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
     <div class="w-full max-w-2xl bg-white rounded-lg shadow-lg p-8">
@@ -124,18 +69,10 @@ const onSubmit: SubmitHandler<typeof profileSchema> = async (values) => {
             name="role"
             class="w-full px-3 py-2 border rounded-lg"
           >
-            <option value="developer">
-              Developer
-            </option>
-            <option value="designer">
-              Designer
-            </option>
-            <option value="manager">
-              Product Manager
-            </option>
-            <option value="other">
-              Other
-            </option>
+            <option value="developer">Developer</option>
+            <option value="designer">Designer</option>
+            <option value="manager">Product Manager</option>
+            <option value="other">Other</option>
           </select>
           <p
             v-if="roleField.errors"
@@ -149,47 +86,19 @@ const onSubmit: SubmitHandler<typeof profileSchema> = async (values) => {
           <label class="block text-sm font-medium mb-2">Experience Level</label>
           <div class="flex gap-4">
             <label class="flex items-center">
-              <input
-                v-bind="experienceField.props"
-                v-model="experienceField.input"
-                type="radio"
-                name="experience"
-                value="junior"
-                class="mr-2"
-              >
+              <input v-bind="experienceField.props" type="radio" name="experience" value="junior" v-model="experienceField.input" class="mr-2">
               Junior
             </label>
             <label class="flex items-center">
-              <input
-                v-bind="experienceField.props"
-                v-model="experienceField.input"
-                type="radio"
-                name="experience"
-                value="mid"
-                class="mr-2"
-              >
+              <input v-bind="experienceField.props" type="radio" name="experience" value="mid" v-model="experienceField.input" class="mr-2">
               Mid
             </label>
             <label class="flex items-center">
-              <input
-                v-bind="experienceField.props"
-                v-model="experienceField.input"
-                type="radio"
-                name="experience"
-                value="senior"
-                class="mr-2"
-              >
+              <input v-bind="experienceField.props" type="radio" name="experience" value="senior" v-model="experienceField.input" class="mr-2">
               Senior
             </label>
             <label class="flex items-center">
-              <input
-                v-bind="experienceField.props"
-                v-model="experienceField.input"
-                type="radio"
-                name="experience"
-                value="lead"
-                class="mr-2"
-              >
+              <input v-bind="experienceField.props" type="radio" name="experience" value="lead" v-model="experienceField.input" class="mr-2">
               Lead
             </label>
           </div>
@@ -207,20 +116,20 @@ const onSubmit: SubmitHandler<typeof profileSchema> = async (values) => {
               for="age"
               class="block text-sm font-medium mb-1"
             >Age</label>
-            <input
-              v-bind="ageField.props"
-              id="age"
-              v-model.number="ageField.input"
-              name="age"
-              type="number"
-              class="w-full px-3 py-2 border rounded-lg"
-            >
-            <p
-              v-if="ageField.errors"
-              class="text-red-500 text-sm mt-1"
-            >
-              {{ ageField.errors[0] }}
-            </p>
+          <input
+            v-bind="ageField.props"
+            id="age"
+            v-model.number="ageField.input"
+            name="age"
+            type="number"
+            class="w-full px-3 py-2 border rounded-lg"
+          >
+          <p
+            v-if="ageField.errors"
+            class="text-red-500 text-sm mt-1"
+          >
+            {{ ageField.errors[0] }}
+          </p>
           </div>
 
           <div>
@@ -269,11 +178,7 @@ const onSubmit: SubmitHandler<typeof profileSchema> = async (values) => {
             v-if="avatarField.input"
             class="text-sm text-gray-500 mt-2"
           >
-            Preview: <img
-              :src="avatarField.input"
-              alt="Avatar preview"
-              class="inline-block size-10 rounded-full ml-2"
-            >
+            Preview: <img :src="avatarField.input" alt="Avatar preview" class="inline-block size-10 rounded-full ml-2">
           </p>
         </div>
 
@@ -345,15 +250,65 @@ const onSubmit: SubmitHandler<typeof profileSchema> = async (values) => {
       </div>
 
       <div class="mt-6 pt-6 border-t text-center text-sm text-gray-500">
-        <a
-          href="https://github.com/onmax/nuxt-formisch"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="hover:text-blue-600 transition-colors"
-        >
+        <a href="https://github.com/onmax/nuxt-formisch" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors">
           View on GitHub →
         </a>
       </div>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { SubmitHandler } from '@formisch/vue'
+
+useHead({ title: 'Formisch + Nuxt Demo' })
+
+// profileSchema is auto-imported
+const submitted = ref(false)
+const submittedData = ref()
+const error = ref('')
+
+const form = useForm({
+  schema: profileSchema,
+  initialValues: {
+    name: 'John Doe',
+    email: 'john@example.com',
+    role: 'developer' as const,
+    experience: 'mid' as const,
+    age: 25,
+    startDate: '2024-01-15',
+    avatar: 'https://i.pravatar.cc/150?img=68',
+    bio: 'I love building forms with Formisch!',
+    newsletter: true,
+  },
+})
+
+const nameField = useField(() => form, () => ({ path: ['name'] as const }))
+const emailField = useField(() => form, () => ({ path: ['email'] as const }))
+const roleField = useField(() => form, () => ({ path: ['role'] as const }))
+const experienceField = useField(() => form, () => ({ path: ['experience'] as const }))
+const ageField = useField(() => form, () => ({ path: ['age'] as const }))
+const startDateField = useField(() => form, () => ({ path: ['startDate'] as const }))
+const avatarField = useField(() => form, () => ({ path: ['avatar'] as const }))
+const bioField = useField(() => form, () => ({ path: ['bio'] as const }))
+const newsletterField = useField(() => form, () => ({ path: ['newsletter'] as const }))
+
+const onSubmit: SubmitHandler<typeof profileSchema> = async (values) => {
+  try {
+    error.value = ''
+    submitted.value = false
+    const response = await $fetch('/api/login', { method: 'POST', body: values })
+    submittedData.value = response
+    submitted.value = true
+  }
+  catch (e) {
+    if (e && typeof e === 'object' && 'data' in e) {
+      const data = e.data as { errors?: Record<string, string> }
+      error.value = data.errors ? JSON.stringify(data.errors) : 'Submission failed'
+    }
+    else {
+      error.value = 'Submission failed'
+    }
+  }
+}
+</script>

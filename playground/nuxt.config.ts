@@ -1,13 +1,8 @@
 export default defineNuxtConfig({
-  modules: ['../src/module', '@nuxtjs/tailwindcss', '@nuxt/eslint'],
+  modules: ['../src/module', '@nuxtjs/tailwindcss'],
   devtools: { enabled: true },
   nitro: {
     output: { dir: '../.vercel/output' },
   },
   formisch: {},
-  eslint: {
-    config: {
-      standalone: false,
-    },
-  },
 })

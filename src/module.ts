@@ -1,6 +1,7 @@
-import { addComponent, addImports, addServerImports, createResolver, defineNuxtModule, logger } from '@nuxt/kit'
+import { defineNuxtModule, addComponent, addImports, addServerImports, createResolver, logger } from '@nuxt/kit'
 
-export interface ModuleOptions extends Record<string, never> {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface ModuleOptions {}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {

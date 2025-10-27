@@ -1,9 +1,9 @@
 import { resolve } from 'node:path'
-import { createPage, setup } from '@nuxt/test-utils/e2e'
-import { expect } from '@playwright/test'
 import { describe, it } from 'vitest'
+import { setup, createPage } from '@nuxt/test-utils/e2e'
+import { expect } from '@playwright/test'
 
-describe('profile form E2E', async () => {
+describe('Profile form E2E', async () => {
   await setup({
     rootDir: resolve(__dirname, '..'),
     browser: true,
@@ -19,14 +19,32 @@ describe('profile form E2E', async () => {
     await page.locator('input[name="age"]').fill('30')
     await page.locator('textarea[name="bio"]').fill('I am a software engineer who loves building forms.')
 
+    // Check for any validation errors before submitting
+    const preSubmitErrors = await page.locator('.text-red-500').count()
+    console.log('Validation errors before submit:', preSubmitErrors)
+
     // Submit
     await page.locator('button[type="submit"]').click()
 
-    // Wait for submission
+    // Wait for submission to complete (button should stop showing "Saving...")
     await page.waitForTimeout(2000)
+    const buttonText = await page.locator('button[type="submit"]').textContent()
+    console.log('Button text after submit:', buttonText)
 
-    // Check for success
+    // Check if there's an error or success
+    const hasError = await page.locator('.bg-red-50').count()
     const hasSuccess = await page.locator('.bg-green-50').count()
+    const postSubmitErrors = await page.locator('.text-red-500').count()
+
+    console.log('Has error div:', hasError)
+    console.log('Has success div:', hasSuccess)
+    console.log('Validation errors after submit:', postSubmitErrors)
+
+    if (hasError > 0) {
+      const errorText = await page.locator('.bg-red-50').textContent()
+      console.log('Error content:', errorText)
+    }
+
     expect(hasSuccess).toBeGreaterThan(0)
 
     await page.close()
