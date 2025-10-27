@@ -309,7 +309,7 @@ const error = ref('')
 const serverOnlyValidation = ref(false)
 
 const form = useForm({
-  schema: profileSchema as typeof profileSchema,
+  schema: profileSchema,
   initialValues: {
     name: 'John Doe',
     email: 'john@example.com',
