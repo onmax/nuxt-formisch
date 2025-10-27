@@ -84,6 +84,9 @@ jobs:
       - name: Install dependencies
         run: npx nypm@latest i
 
+      - name: Prepare playground
+        run: npm run dev:prepare
+
       - name: Build module
         run: npm run prepack
 
