@@ -10,8 +10,9 @@ Formisch integration for Nuxt - schema-based, headless form library
 ## Features
 
 - 🚀 Auto-imports `useForm`, `useField`, `useFieldArray` composables
-- 🎨 Auto-imports `FormischForm`, `FormischField`, `FormischFieldArray` components
+- 🎨 Auto-imports `FForm`, `FField`, `FFieldArray` components
 - 📦 Auto-imports all Formisch methods (`focus`, `reset`, `validate`, etc.)
+- 🔒 Server-side validation with `useFormValidation` composable
 - ✨ Zero-config setup
 - 🔥 Full TypeScript support
 - ⚡️ Leverages @formisch/vue under the hood
@@ -32,27 +33,28 @@ export default defineNuxtConfig({
 
 ## Usage
 
-Create forms without imports:
+Create forms with minimal boilerplate:
 
 ```vue
 <template>
-  <FormischForm :of="form" :on-submit="onSubmit">
-    <FormischField :of="form" name="email" type="email" />
+  <FForm :of="form" :on-submit="(values) => onSubmit(values)">
+    <input v-model="emailField.input" type="email" />
+    <p v-if="emailField.errors">{{ emailField.errors[0] }}</p>
     <button type="submit">Submit</button>
-  </FormischForm>
+  </FForm>
 </template>
 
 <script setup lang="ts">
 import * as v from 'valibot'
 
 const schema = v.object({
-  email: v.pipe(v.string(), v.email())
+  email: v.pipe(v.string(), v.email('Invalid email'))
 })
 
 const form = useForm({ schema })
+const emailField = useField(() => form, () => ({ path: ['email'] as const }))
 
-// SubmitHandler is auto-imported
-const onSubmit: SubmitHandler<typeof schema> = async (values) => {
+async function onSubmit(values: v.InferOutput<typeof schema>) {
   console.log(values) // Fully typed!
 }
 </script>
@@ -60,29 +62,31 @@ const onSubmit: SubmitHandler<typeof schema> = async (values) => {
 
 ## Server-Side Validation
 
-Share schemas between client and server for full-stack type safety.
+Share schemas between client and server for full-stack type safety using Nuxt v4's `shared/` directory.
 
-### 1. Create shared schemas in `utils/`
+### 1. Create shared schemas in `shared/utils/`
 
 ```ts
-// utils/schemas.ts
+// shared/utils/schemas.ts
 import * as v from 'valibot'
 
 export const loginSchema = v.object({
-  email: v.pipe(v.string(), v.email()),
-  password: v.pipe(v.string(), v.minLength(8))
+  email: v.pipe(v.string(), v.email('Invalid email')),
+  password: v.pipe(v.string(), v.minLength(8, 'Password must be 8+ chars'))
 })
 
 export type LoginInput = v.InferInput<typeof loginSchema>
+export type LoginOutput = v.InferOutput<typeof loginSchema>
 ```
 
 ### 2. Use in API routes with `useFormValidation`
 
 ```ts
 // server/api/login.post.ts
+import { loginSchema } from '#shared/utils/schemas'
+
 export default defineEventHandler(async (event) => {
-  // Auto-imported: useFormValidation and loginSchema
-  // Uses h3's readValidatedBody under the hood
+  // useFormValidation is auto-imported
   const data = await useFormValidation(event, loginSchema)
 
   // data is typed and validated
@@ -96,18 +100,26 @@ export default defineEventHandler(async (event) => {
 
 ```vue
 <template>
-  <FormischForm :of="form" :on-submit="onSubmit">
-    <FormischField :of="form" name="email" type="email" />
-    <FormischField :of="form" name="password" type="password" />
+  <FForm :of="form" :on-submit="(values) => onSubmit(values)">
+    <input v-model="emailField.input" type="email" />
+    <p v-if="emailField.errors">{{ emailField.errors[0] }}</p>
+
+    <input v-model="passwordField.input" type="password" />
+    <p v-if="passwordField.errors">{{ passwordField.errors[0] }}</p>
+
     <button type="submit">Login</button>
-  </FormischForm>
+  </FForm>
 </template>
 
 <script setup lang="ts">
-// SubmitHandler and loginSchema are auto-imported
-const form = useForm({ schema: loginSchema })
+// loginSchema is auto-imported from #shared/utils/schemas
+import type { LoginOutput } from '#shared/utils/schemas'
 
-const onSubmit: SubmitHandler<typeof loginSchema> = async (values) => {
+const form = useForm({ schema: loginSchema })
+const emailField = useField(() => form, () => ({ path: ['email'] as const }))
+const passwordField = useField(() => form, () => ({ path: ['password'] as const }))
+
+async function onSubmit(values: LoginOutput) {
   await $fetch('/api/login', { method: 'POST', body: values })
 }
 </script>
@@ -122,13 +134,17 @@ const onSubmit: SubmitHandler<typeof loginSchema> = async (values) => {
 - `useFormValidation` - validates request body against schema
 
 ### Components
-- `FormischForm`, `FormischField`, `FormischFieldArray`
+- `FForm`, `FField`, `FFieldArray` (prefixed with F)
 
 ### Methods
 - `focus`, `getAllErrors`, `getErrors`, `getInput`, `handleSubmit`, `insert`, `move`, `remove`, `replace`, `reset`, `setErrors`, `setInput`, `submit`, `swap`, `validate`
 
 ### Types
 - `SubmitHandler`, `FormConfig`, `Schema`, `FieldElement`, `DeepPartial`, `PartialValues`, `PathValue`, `RequiredPath`, `ValidArrayPath`, `ValidationMode`, `ValidPath`
+
+## Demo
+
+Check out the live demo: [nuxt-formisch.vercel.app](https://nuxt-formisch.vercel.app)
 
 ## Development
 
