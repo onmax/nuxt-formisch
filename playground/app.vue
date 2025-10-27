@@ -356,7 +356,7 @@ const avatarField = useField(() => form, () => ({ path: ['avatar'] as const }))
 const bioField = useField(() => form, () => ({ path: ['bio'] as const }))
 const newsletterField = useField(() => form, () => ({ path: ['newsletter'] as const }))
 
-const onSubmit: SubmitHandler<typeof profileSchema> = async (values) => {
+const onSubmit: SubmitHandler<typeof profileSchema> = async (values: ProfileInput) => {
   try {
     error.value = ''
     submitted.value = false
