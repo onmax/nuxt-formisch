@@ -5,11 +5,12 @@
         Formisch + Nuxt
       </h1>
 
-      <FormischForm
-        :of="form"
-        class="space-y-4"
-        :on-submit="onSubmit"
-      >
+      <ClientOnly>
+        <FormischForm
+          :of="form"
+          class="space-y-4"
+          :on-submit="onSubmit"
+        >
         <div>
           <label class="block text-sm font-medium mb-1">Email</label>
           <FormischField
@@ -49,7 +50,8 @@
         >
           {{ form.isSubmitting ? 'Submitting...' : 'Submit' }}
         </button>
-      </FormischForm>
+        </FormischForm>
+      </ClientOnly>
 
       <div
         v-if="error"
