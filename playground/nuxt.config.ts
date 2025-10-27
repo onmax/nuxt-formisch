@@ -1,5 +1,6 @@
 export default defineNuxtConfig({
-  modules: ['../src/module', '@nuxtjs/tailwindcss'],
+  modules: ['../src/module', '@nuxt/ui'],
+  css: ['~/assets/css/main.css'],
   devtools: { enabled: true },
   nitro: {
     output: { dir: '../.vercel/output' },
