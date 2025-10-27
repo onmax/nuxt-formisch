@@ -18,3 +18,4 @@ export const profileSchema = v.object({
 })
 
 export type ProfileInput = v.InferInput<typeof profileSchema>
+export type ProfileOutput = v.InferOutput<typeof profileSchema>
