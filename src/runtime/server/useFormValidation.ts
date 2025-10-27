@@ -1,6 +1,7 @@
-import type { H3Event, ValidateFunction } from 'h3'
+import type { H3Event } from 'h3'
 import { readValidatedBody } from 'h3'
 import type { BaseSchema, BaseIssue, InferOutput } from 'valibot'
+import { parse } from 'valibot'
 
 /**
  * Server-side form validation composable
@@ -18,7 +19,6 @@ export async function useFormValidation<TSchema extends BaseSchema<unknown, unkn
   event: H3Event,
   schema: TSchema,
 ): Promise<InferOutput<TSchema>> {
-  // h3's readValidatedBody supports Standard-Schema compatible validators
-  // Valibot v1+ implements Standard Schema spec - cast needed for h3 types
-  return await readValidatedBody(event, schema as unknown as ValidateFunction<InferOutput<TSchema>>)
+  // Wrap Valibot schema in a validation function for h3
+  return await readValidatedBody(event, data => parse(schema, data))
 }

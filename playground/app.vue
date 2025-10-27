@@ -11,9 +11,14 @@
         :on-submit="onSubmit"
       >
         <div>
-          <label class="block text-sm font-medium mb-1">Email</label>
+          <label
+            for="email"
+            class="block text-sm font-medium mb-1"
+          >Email</label>
           <input
             v-bind="emailField.props"
+            id="email"
+            name="email"
             type="email"
             class="w-full px-3 py-2 border rounded-lg"
           >
@@ -26,9 +31,14 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1">Password</label>
+          <label
+            for="password"
+            class="block text-sm font-medium mb-1"
+          >Password</label>
           <input
             v-bind="passwordField.props"
+            id="password"
+            name="password"
             type="password"
             class="w-full px-3 py-2 border rounded-lg"
           >
