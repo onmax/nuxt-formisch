@@ -4,9 +4,28 @@
       <h1 class="text-3xl font-bold mb-2">
         Profile Form
       </h1>
-      <p class="text-gray-600 mb-6">
+      <p class="text-gray-600 mb-4">
         Demo: Formisch + Nuxt with server-side validation
       </p>
+
+      <div class="mb-6 p-4 bg-gray-100 rounded-lg flex items-center justify-between">
+        <div>
+          <p class="font-medium text-sm">
+            Validation Mode
+          </p>
+          <p class="text-xs text-gray-600">
+            {{ serverOnlyValidation ? 'Server-only validation' : 'Frontend + Server validation' }}
+          </p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input
+            v-model="serverOnlyValidation"
+            type="checkbox"
+            class="sr-only peer"
+          >
+          <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
+        </label>
+      </div>
 
       <FormischForm
         :of="form"
@@ -69,10 +88,18 @@
             name="role"
             class="w-full px-3 py-2 border rounded-lg"
           >
-            <option value="developer">Developer</option>
-            <option value="designer">Designer</option>
-            <option value="manager">Product Manager</option>
-            <option value="other">Other</option>
+            <option value="developer">
+              Developer
+            </option>
+            <option value="designer">
+              Designer
+            </option>
+            <option value="manager">
+              Product Manager
+            </option>
+            <option value="other">
+              Other
+            </option>
           </select>
           <p
             v-if="roleField.errors"
@@ -86,19 +113,47 @@
           <label class="block text-sm font-medium mb-2">Experience Level</label>
           <div class="flex gap-4">
             <label class="flex items-center">
-              <input v-bind="experienceField.props" type="radio" name="experience" value="junior" v-model="experienceField.input" class="mr-2">
+              <input
+                v-bind="experienceField.props"
+                v-model="experienceField.input"
+                type="radio"
+                name="experience"
+                value="junior"
+                class="mr-2"
+              >
               Junior
             </label>
             <label class="flex items-center">
-              <input v-bind="experienceField.props" type="radio" name="experience" value="mid" v-model="experienceField.input" class="mr-2">
+              <input
+                v-bind="experienceField.props"
+                v-model="experienceField.input"
+                type="radio"
+                name="experience"
+                value="mid"
+                class="mr-2"
+              >
               Mid
             </label>
             <label class="flex items-center">
-              <input v-bind="experienceField.props" type="radio" name="experience" value="senior" v-model="experienceField.input" class="mr-2">
+              <input
+                v-bind="experienceField.props"
+                v-model="experienceField.input"
+                type="radio"
+                name="experience"
+                value="senior"
+                class="mr-2"
+              >
               Senior
             </label>
             <label class="flex items-center">
-              <input v-bind="experienceField.props" type="radio" name="experience" value="lead" v-model="experienceField.input" class="mr-2">
+              <input
+                v-bind="experienceField.props"
+                v-model="experienceField.input"
+                type="radio"
+                name="experience"
+                value="lead"
+                class="mr-2"
+              >
               Lead
             </label>
           </div>
@@ -116,20 +171,20 @@
               for="age"
               class="block text-sm font-medium mb-1"
             >Age</label>
-          <input
-            v-bind="ageField.props"
-            id="age"
-            v-model.number="ageField.input"
-            name="age"
-            type="number"
-            class="w-full px-3 py-2 border rounded-lg"
-          >
-          <p
-            v-if="ageField.errors"
-            class="text-red-500 text-sm mt-1"
-          >
-            {{ ageField.errors[0] }}
-          </p>
+            <input
+              v-bind="ageField.props"
+              id="age"
+              v-model.number="ageField.input"
+              name="age"
+              type="number"
+              class="w-full px-3 py-2 border rounded-lg"
+            >
+            <p
+              v-if="ageField.errors"
+              class="text-red-500 text-sm mt-1"
+            >
+              {{ ageField.errors[0] }}
+            </p>
           </div>
 
           <div>
@@ -178,7 +233,11 @@
             v-if="avatarField.input"
             class="text-sm text-gray-500 mt-2"
           >
-            Preview: <img :src="avatarField.input" alt="Avatar preview" class="inline-block size-10 rounded-full ml-2">
+            Preview: <img
+              :src="avatarField.input"
+              alt="Avatar preview"
+              class="inline-block size-10 rounded-full ml-2"
+            >
           </p>
         </div>
 
@@ -250,7 +309,12 @@
       </div>
 
       <div class="mt-6 pt-6 border-t text-center text-sm text-gray-500">
-        <a href="https://github.com/onmax/nuxt-formisch" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors">
+        <a
+          href="https://github.com/onmax/nuxt-formisch"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hover:text-blue-600 transition-colors"
+        >
           View on GitHub →
         </a>
       </div>
@@ -259,17 +323,16 @@
 </template>
 
 <script setup lang="ts">
-import type { SubmitHandler } from '@formisch/vue'
-
 useHead({ title: 'Formisch + Nuxt Demo' })
 
 // profileSchema is auto-imported
 const submitted = ref(false)
 const submittedData = ref()
 const error = ref('')
+const serverOnlyValidation = ref(false)
 
 const form = useForm({
-  schema: profileSchema,
+  schema: computed(() => serverOnlyValidation.value ? undefined : profileSchema),
   initialValues: {
     name: 'John Doe',
     email: 'john@example.com',
@@ -293,7 +356,7 @@ const avatarField = useField(() => form, () => ({ path: ['avatar'] as const }))
 const bioField = useField(() => form, () => ({ path: ['bio'] as const }))
 const newsletterField = useField(() => form, () => ({ path: ['newsletter'] as const }))
 
-const onSubmit: SubmitHandler<typeof profileSchema> = async (values) => {
+const onSubmit = async (values: unknown) => {
   try {
     error.value = ''
     submitted.value = false
@@ -303,8 +366,18 @@ const onSubmit: SubmitHandler<typeof profileSchema> = async (values) => {
   }
   catch (e) {
     if (e && typeof e === 'object' && 'data' in e) {
-      const data = e.data as { errors?: Record<string, string> }
-      error.value = data.errors ? JSON.stringify(data.errors) : 'Submission failed'
+      const data = e.data as { errors?: Record<string, string>, message?: string }
+      if (data.errors) {
+        error.value = Object.entries(data.errors)
+          .map(([field, msg]) => `${field}: ${msg}`)
+          .join('\n')
+      }
+      else if (data.message) {
+        error.value = data.message
+      }
+      else {
+        error.value = 'Submission failed'
+      }
     }
     else {
       error.value = 'Submission failed'

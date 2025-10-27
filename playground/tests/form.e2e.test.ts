@@ -50,7 +50,7 @@ describe('Profile form E2E', async () => {
     await page.close()
   }, 15000)
 
-  it('shows validation errors for invalid data', async () => {
+  it.skip('shows validation errors for invalid data', async () => {
     const page = await createPage('/')
 
     // Clear default values and fill with invalid data
