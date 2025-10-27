@@ -92,7 +92,13 @@ const submitted = ref(false)
 const submittedData = ref()
 const error = ref('')
 
-const form = useForm({ schema: loginSchema })
+const form = useForm({
+  schema: loginSchema,
+  initialValues: {
+    email: '',
+    password: '',
+  },
+})
 
 const emailField = useField(() => form, () => ({ path: ['email'] as const }))
 const passwordField = useField(() => form, () => ({ path: ['password'] as const }))
