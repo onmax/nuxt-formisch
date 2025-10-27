@@ -13,7 +13,10 @@ export default defineEventHandler(async (event) => {
       name: data.name,
       email: data.email,
       role: data.role,
+      experience: data.experience,
       age: data.age,
+      startDate: data.startDate,
+      avatar: data.avatar,
       newsletter: data.newsletter,
     },
   }

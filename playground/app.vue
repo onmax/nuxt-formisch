@@ -83,10 +83,39 @@
         </div>
 
         <div>
-          <label
-            for="age"
-            class="block text-sm font-medium mb-1"
-          >Age</label>
+          <label class="block text-sm font-medium mb-2">Experience Level</label>
+          <div class="flex gap-4">
+            <label class="flex items-center">
+              <input v-bind="experienceField.props" type="radio" name="experience" value="junior" v-model="experienceField.input" class="mr-2">
+              Junior
+            </label>
+            <label class="flex items-center">
+              <input v-bind="experienceField.props" type="radio" name="experience" value="mid" v-model="experienceField.input" class="mr-2">
+              Mid
+            </label>
+            <label class="flex items-center">
+              <input v-bind="experienceField.props" type="radio" name="experience" value="senior" v-model="experienceField.input" class="mr-2">
+              Senior
+            </label>
+            <label class="flex items-center">
+              <input v-bind="experienceField.props" type="radio" name="experience" value="lead" v-model="experienceField.input" class="mr-2">
+              Lead
+            </label>
+          </div>
+          <p
+            v-if="experienceField.errors"
+            class="text-red-500 text-sm mt-1"
+          >
+            {{ experienceField.errors[0] }}
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label
+              for="age"
+              class="block text-sm font-medium mb-1"
+            >Age</label>
           <input
             v-bind="ageField.props"
             id="age"
@@ -100,6 +129,56 @@
             class="text-red-500 text-sm mt-1"
           >
             {{ ageField.errors[0] }}
+          </p>
+          </div>
+
+          <div>
+            <label
+              for="startDate"
+              class="block text-sm font-medium mb-1"
+            >Start Date</label>
+            <input
+              v-bind="startDateField.props"
+              id="startDate"
+              v-model="startDateField.input"
+              name="startDate"
+              type="date"
+              class="w-full px-3 py-2 border rounded-lg"
+            >
+            <p
+              v-if="startDateField.errors"
+              class="text-red-500 text-sm mt-1"
+            >
+              {{ startDateField.errors[0] }}
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <label
+            for="avatar"
+            class="block text-sm font-medium mb-1"
+          >Avatar URL (optional)</label>
+          <input
+            v-bind="avatarField.props"
+            id="avatar"
+            v-model="avatarField.input"
+            name="avatar"
+            type="url"
+            placeholder="https://example.com/avatar.jpg"
+            class="w-full px-3 py-2 border rounded-lg"
+          >
+          <p
+            v-if="avatarField.errors"
+            class="text-red-500 text-sm mt-1"
+          >
+            {{ avatarField.errors[0] }}
+          </p>
+          <p
+            v-if="avatarField.input"
+            class="text-sm text-gray-500 mt-2"
+          >
+            Preview: <img :src="avatarField.input" alt="Avatar preview" class="inline-block size-10 rounded-full ml-2">
           </p>
         </div>
 
@@ -189,7 +268,10 @@ const form = useForm({
     name: 'John Doe',
     email: 'john@example.com',
     role: 'developer' as const,
+    experience: 'mid' as const,
     age: 25,
+    startDate: '2024-01-15',
+    avatar: 'https://i.pravatar.cc/150?img=68',
     bio: 'I love building forms with Formisch!',
     newsletter: true,
   },
@@ -198,7 +280,10 @@ const form = useForm({
 const nameField = useField(() => form, () => ({ path: ['name'] as const }))
 const emailField = useField(() => form, () => ({ path: ['email'] as const }))
 const roleField = useField(() => form, () => ({ path: ['role'] as const }))
+const experienceField = useField(() => form, () => ({ path: ['experience'] as const }))
 const ageField = useField(() => form, () => ({ path: ['age'] as const }))
+const startDateField = useField(() => form, () => ({ path: ['startDate'] as const }))
+const avatarField = useField(() => form, () => ({ path: ['avatar'] as const }))
 const bioField = useField(() => form, () => ({ path: ['bio'] as const }))
 const newsletterField = useField(() => form, () => ({ path: ['newsletter'] as const }))
 

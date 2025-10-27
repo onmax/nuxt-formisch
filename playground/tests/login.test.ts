@@ -13,7 +13,10 @@ describe('Profile form validation', async () => {
       name: 'Jane Smith',
       email: 'jane@example.com',
       role: 'designer',
+      experience: 'senior',
       age: 30,
+      startDate: '2023-01-15',
+      avatar: 'https://i.pravatar.cc/150?img=5',
       bio: 'I am a software engineer who loves building forms.',
       newsletter: true,
     }
@@ -30,7 +33,10 @@ describe('Profile form validation', async () => {
         name: validData.name,
         email: validData.email,
         role: validData.role,
+        experience: validData.experience,
         age: validData.age,
+        startDate: validData.startDate,
+        avatar: validData.avatar,
         newsletter: validData.newsletter,
       },
     })
@@ -41,7 +47,9 @@ describe('Profile form validation', async () => {
       name: 'Jane Smith',
       email: 'not-an-email',
       role: 'developer',
+      experience: 'mid',
       age: 30,
+      startDate: '2023-01-15',
       bio: 'I am a software engineer.',
       newsletter: false,
     }
@@ -59,7 +67,9 @@ describe('Profile form validation', async () => {
       name: 'Jane Smith',
       email: 'jane@example.com',
       role: 'developer',
+      experience: 'junior',
       age: 15,
+      startDate: '2023-01-15',
       bio: 'I am a software engineer.',
       newsletter: false,
     }
