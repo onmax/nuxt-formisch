@@ -1,0 +1,5 @@
+{
+  "buildCommand": "pnpm run dev:prepare && pnpm run dev:build",
+  "outputDirectory": "playground/.output/public",
+  "installCommand": "pnpm install"
+}
