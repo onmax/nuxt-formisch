@@ -1,8 +1,10 @@
+import { resolve } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import { setup, $fetch } from '@nuxt/test-utils/e2e'
 
 describe('Login form validation', async () => {
   await setup({
+    rootDir: resolve(__dirname, '..'),
     server: true,
   })
 
