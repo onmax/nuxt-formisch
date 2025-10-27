@@ -5,6 +5,7 @@
   "repository": "formisch/nuxt",
   "license": "MIT",
   "type": "module",
+  "packageManager": "pnpm@9.15.2",
   "exports": {
     ".": {
       "types": "./dist/types.d.mts",
