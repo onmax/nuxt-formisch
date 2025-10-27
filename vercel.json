@@ -1,0 +1,4 @@
+{
+  "buildCommand": "pnpm run dev:prepare && pnpm run dev:build",
+  "installCommand": "pnpm install"
+}
