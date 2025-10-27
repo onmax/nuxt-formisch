@@ -2,16 +2,20 @@ import { resolve } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import { setup, $fetch } from '@nuxt/test-utils/e2e'
 
-describe('Login form validation', async () => {
+describe('Profile form validation', async () => {
   await setup({
     rootDir: resolve(__dirname, '..'),
     server: true,
   })
 
-  it('successfully validates and submits valid login data', async () => {
+  it('successfully validates and submits valid profile data', async () => {
     const validData = {
-      email: 'test@example.com',
-      password: 'password123',
+      name: 'Jane Smith',
+      email: 'jane@example.com',
+      role: 'designer',
+      age: 30,
+      bio: 'I am a software engineer who loves building forms.',
+      newsletter: true,
     }
 
     const response = await $fetch('/api/login', {
@@ -21,17 +25,25 @@ describe('Login form validation', async () => {
 
     expect(response).toMatchObject({
       success: true,
-      message: 'Login successful',
-      user: {
+      message: 'Profile saved successfully',
+      profile: {
+        name: validData.name,
         email: validData.email,
+        role: validData.role,
+        age: validData.age,
+        newsletter: validData.newsletter,
       },
     })
   })
 
   it('rejects invalid email format', async () => {
     const invalidData = {
+      name: 'Jane Smith',
       email: 'not-an-email',
-      password: 'password123',
+      role: 'developer',
+      age: 30,
+      bio: 'I am a software engineer.',
+      newsletter: false,
     }
 
     await expect(
@@ -42,10 +54,14 @@ describe('Login form validation', async () => {
     ).rejects.toThrow()
   })
 
-  it('rejects short password', async () => {
+  it('rejects age under 18', async () => {
     const invalidData = {
-      email: 'test@example.com',
-      password: 'short',
+      name: 'Jane Smith',
+      email: 'jane@example.com',
+      role: 'developer',
+      age: 15,
+      bio: 'I am a software engineer.',
+      newsletter: false,
     }
 
     await expect(
@@ -58,7 +74,8 @@ describe('Login form validation', async () => {
 
   it('rejects missing fields', async () => {
     const invalidData = {
-      email: 'test@example.com',
+      name: 'Jane Smith',
+      email: 'jane@example.com',
     }
 
     await expect(

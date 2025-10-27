@@ -5,16 +5,13 @@ import * as v from 'valibot'
  * Place in utils/ folder for auto-import in Nuxt
  */
 
-export const loginSchema = v.object({
-  email: v.pipe(v.string(), v.email('Invalid email')),
-  password: v.pipe(v.string(), v.minLength(8, 'Min 8 chars')),
+export const profileSchema = v.object({
+  name: v.pipe(v.string(), v.minLength(2, 'Name must be at least 2 characters')),
+  email: v.pipe(v.string(), v.email('Invalid email address')),
+  role: v.picklist(['developer', 'designer', 'manager', 'other'], 'Please select a role'),
+  age: v.pipe(v.number(), v.minValue(18, 'Must be 18 or older'), v.maxValue(120, 'Invalid age')),
+  bio: v.pipe(v.string(), v.minLength(10, 'Bio must be at least 10 characters')),
+  newsletter: v.boolean(),
 })
 
-export const contactSchema = v.object({
-  name: v.pipe(v.string(), v.minLength(2, 'Min 2 chars')),
-  email: v.pipe(v.string(), v.email('Invalid email')),
-  message: v.pipe(v.string(), v.minLength(10, 'Min 10 chars')),
-})
-
-export type LoginInput = v.InferInput<typeof loginSchema>
-export type ContactInput = v.InferInput<typeof contactSchema>
+export type ProfileInput = v.InferInput<typeof profileSchema>

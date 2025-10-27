@@ -1,84 +1,173 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-    <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
-      <h1 class="text-2xl font-bold mb-6">
-        Formisch + Nuxt
+    <div class="w-full max-w-2xl bg-white rounded-lg shadow-lg p-8">
+      <h1 class="text-3xl font-bold mb-2">
+        Profile Form
       </h1>
+      <p class="text-gray-600 mb-6">
+        Demo: Formisch + Nuxt with server-side validation
+      </p>
 
       <FormischForm
         :of="form"
-        class="space-y-4"
+        class="space-y-6"
         :on-submit="onSubmit"
       >
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label
+              for="name"
+              class="block text-sm font-medium mb-1"
+            >Name</label>
+            <input
+              v-bind="nameField.props"
+              id="name"
+              v-model="nameField.input"
+              name="name"
+              type="text"
+              class="w-full px-3 py-2 border rounded-lg"
+            >
+            <p
+              v-if="nameField.errors"
+              class="text-red-500 text-sm mt-1"
+            >
+              {{ nameField.errors[0] }}
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="email"
+              class="block text-sm font-medium mb-1"
+            >Email</label>
+            <input
+              v-bind="emailField.props"
+              id="email"
+              v-model="emailField.input"
+              name="email"
+              type="email"
+              class="w-full px-3 py-2 border rounded-lg"
+            >
+            <p
+              v-if="emailField.errors"
+              class="text-red-500 text-sm mt-1"
+            >
+              {{ emailField.errors[0] }}
+            </p>
+          </div>
+        </div>
+
         <div>
           <label
-            for="email"
+            for="role"
             class="block text-sm font-medium mb-1"
-          >Email</label>
-          <input
-            v-bind="emailField.props"
-            id="email"
-            v-model="emailField.input"
-            name="email"
-            type="email"
+          >Role</label>
+          <select
+            v-bind="roleField.props"
+            id="role"
+            v-model="roleField.input"
+            name="role"
             class="w-full px-3 py-2 border rounded-lg"
           >
+            <option value="developer">Developer</option>
+            <option value="designer">Designer</option>
+            <option value="manager">Product Manager</option>
+            <option value="other">Other</option>
+          </select>
           <p
-            v-if="emailField.errors"
+            v-if="roleField.errors"
             class="text-red-500 text-sm mt-1"
           >
-            {{ emailField.errors[0] }}
+            {{ roleField.errors[0] }}
           </p>
         </div>
 
         <div>
           <label
-            for="password"
+            for="age"
             class="block text-sm font-medium mb-1"
-          >Password</label>
+          >Age</label>
           <input
-            v-bind="passwordField.props"
-            id="password"
-            v-model="passwordField.input"
-            name="password"
-            type="password"
+            v-bind="ageField.props"
+            id="age"
+            v-model.number="ageField.input"
+            name="age"
+            type="number"
             class="w-full px-3 py-2 border rounded-lg"
           >
           <p
-            v-if="passwordField.errors"
+            v-if="ageField.errors"
             class="text-red-500 text-sm mt-1"
           >
-            {{ passwordField.errors[0] }}
+            {{ ageField.errors[0] }}
           </p>
+        </div>
+
+        <div>
+          <label
+            for="bio"
+            class="block text-sm font-medium mb-1"
+          >Bio</label>
+          <textarea
+            v-bind="bioField.props"
+            id="bio"
+            v-model="bioField.input"
+            name="bio"
+            rows="4"
+            class="w-full px-3 py-2 border rounded-lg"
+          />
+          <p
+            v-if="bioField.errors"
+            class="text-red-500 text-sm mt-1"
+          >
+            {{ bioField.errors[0] }}
+          </p>
+        </div>
+
+        <div class="flex items-center">
+          <input
+            v-bind="newsletterField.props"
+            id="newsletter"
+            v-model="newsletterField.input"
+            name="newsletter"
+            type="checkbox"
+            class="h-4 w-4 text-blue-600 border-gray-300 rounded"
+          >
+          <label
+            for="newsletter"
+            class="ml-2 block text-sm"
+          >
+            Subscribe to newsletter
+          </label>
         </div>
 
         <button
           type="submit"
           :disabled="form.isSubmitting"
-          class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+          class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50 font-medium"
         >
-          {{ form.isSubmitting ? 'Submitting...' : 'Submit' }}
+          {{ form.isSubmitting ? 'Saving...' : 'Save Profile' }}
         </button>
       </FormischForm>
 
       <div
         v-if="error"
-        class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg"
+        class="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg"
       >
         <p class="text-red-800 font-semibold">
           Error!
         </p>
-        <pre class="text-sm mt-2">{{ error }}</pre>
+        <pre class="text-sm mt-2 text-red-700">{{ error }}</pre>
       </div>
 
       <div
         v-if="submitted"
-        class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg"
+        class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg"
       >
-        <p class="text-green-800 font-semibold">
-          Form submitted!
+        <p class="text-green-800 font-semibold mb-2">
+          ✓ Profile saved successfully!
         </p>
-        <pre class="text-sm mt-2">{{ JSON.stringify(submittedData, null, 2) }}</pre>
+        <pre class="text-sm text-gray-700 bg-white p-3 rounded border">{{ JSON.stringify(submittedData, null, 2) }}</pre>
       </div>
     </div>
   </div>
@@ -87,25 +176,34 @@
 <script setup lang="ts">
 import type { SubmitHandler } from '@formisch/vue'
 
-// loginSchema is auto-imported
+// profileSchema is auto-imported
 const submitted = ref(false)
 const submittedData = ref()
 const error = ref('')
 
 const form = useForm({
-  schema: loginSchema,
+  schema: profileSchema,
   initialValues: {
-    email: '',
-    password: '',
+    name: 'John Doe',
+    email: 'john@example.com',
+    role: 'developer' as const,
+    age: 25,
+    bio: 'I love building forms with Formisch!',
+    newsletter: true,
   },
 })
 
+const nameField = useField(() => form, () => ({ path: ['name'] as const }))
 const emailField = useField(() => form, () => ({ path: ['email'] as const }))
-const passwordField = useField(() => form, () => ({ path: ['password'] as const }))
+const roleField = useField(() => form, () => ({ path: ['role'] as const }))
+const ageField = useField(() => form, () => ({ path: ['age'] as const }))
+const bioField = useField(() => form, () => ({ path: ['bio'] as const }))
+const newsletterField = useField(() => form, () => ({ path: ['newsletter'] as const }))
 
-const onSubmit: SubmitHandler<typeof loginSchema> = async (values) => {
+const onSubmit: SubmitHandler<typeof profileSchema> = async (values) => {
   try {
     error.value = ''
+    submitted.value = false
     const response = await $fetch('/api/login', { method: 'POST', body: values })
     submittedData.value = response
     submitted.value = true
