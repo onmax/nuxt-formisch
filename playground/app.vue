@@ -10,47 +10,35 @@
         class="space-y-4"
         :on-submit="onSubmit"
       >
-        <FormischField
-          v-slot="field"
-          :of="form"
-          :path="['email']"
-        >
-          <div>
-            <label class="block text-sm font-medium mb-1">Email</label>
-            <input
-              v-bind="field.props"
-              type="email"
-              class="w-full px-3 py-2 border rounded-lg"
-            >
-            <p
-              v-if="field.errors"
-              class="text-red-500 text-sm mt-1"
-            >
-              {{ field.errors[0] }}
-            </p>
-          </div>
-        </FormischField>
+        <div>
+          <label class="block text-sm font-medium mb-1">Email</label>
+          <input
+            v-bind="emailField.props"
+            type="email"
+            class="w-full px-3 py-2 border rounded-lg"
+          >
+          <p
+            v-if="emailField.errors"
+            class="text-red-500 text-sm mt-1"
+          >
+            {{ emailField.errors[0] }}
+          </p>
+        </div>
 
-        <FormischField
-          v-slot="field"
-          :of="form"
-          :path="['password']"
-        >
-          <div>
-            <label class="block text-sm font-medium mb-1">Password</label>
-            <input
-              v-bind="field.props"
-              type="password"
-              class="w-full px-3 py-2 border rounded-lg"
-            >
-            <p
-              v-if="field.errors"
-              class="text-red-500 text-sm mt-1"
-            >
-              {{ field.errors[0] }}
-            </p>
-          </div>
-        </FormischField>
+        <div>
+          <label class="block text-sm font-medium mb-1">Password</label>
+          <input
+            v-bind="passwordField.props"
+            type="password"
+            class="w-full px-3 py-2 border rounded-lg"
+          >
+          <p
+            v-if="passwordField.errors"
+            class="text-red-500 text-sm mt-1"
+          >
+            {{ passwordField.errors[0] }}
+          </p>
+        </div>
 
         <button
           type="submit"
@@ -93,6 +81,9 @@ const submittedData = ref()
 const error = ref('')
 
 const form = useForm({ schema: loginSchema })
+
+const emailField = useField(() => form, () => ({ path: ['email'] as const }))
+const passwordField = useField(() => form, () => ({ path: ['password'] as const }))
 
 const onSubmit: SubmitHandler<typeof loginSchema> = async (values) => {
   try {
