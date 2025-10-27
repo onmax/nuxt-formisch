@@ -142,6 +142,34 @@ async function onSubmit(values: LoginOutput) {
 ### Types
 - `SubmitHandler`, `FormConfig`, `Schema`, `FieldElement`, `DeepPartial`, `PartialValues`, `PathValue`, `RequiredPath`, `ValidArrayPath`, `ValidationMode`, `ValidPath`
 
+## Nuxt UI Integration
+
+Works seamlessly with Nuxt UI v4. Wrap fields with `UFormField` for labels & errors, bind field state to Nuxt UI inputs:
+
+```vue
+<template>
+  <FForm :of="form" :on-submit="onSubmit">
+    <UFormField label="Email" :error="emailField.errors?.[0]">
+      <UInput v-model="emailField.input" type="email" />
+    </UFormField>
+
+    <UFormField label="Role" :error="roleField.errors?.[0]">
+      <USelect v-model="roleField.input" :items="roles" />
+    </UFormField>
+
+    <UCheckbox v-model="newsletterField.input" label="Subscribe" />
+    <UButton type="submit" :loading="form.isSubmitting">Submit</UButton>
+  </FForm>
+</template>
+
+<script setup lang="ts">
+const form = useForm({ schema })
+const emailField = useField(() => form, () => ({ path: ['email'] as const }))
+const roleField = useField(() => form, () => ({ path: ['role'] as const }))
+const newsletterField = useField(() => form, () => ({ path: ['newsletter'] as const }))
+</script>
+```
+
 ## Demo
 
 Check out the live demo: [nuxt-formisch.vercel.app](https://nuxt-formisch.vercel.app)
