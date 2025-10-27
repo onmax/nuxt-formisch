@@ -13,7 +13,7 @@
         <FormischField
           v-slot="field"
           :of="form"
-          :name="'email'"
+          :path="['email']"
         >
           <div>
             <label class="block text-sm font-medium mb-1">Email</label>
@@ -34,7 +34,7 @@
         <FormischField
           v-slot="field"
           :of="form"
-          :name="'password'"
+          :path="['password']"
         >
           <div>
             <label class="block text-sm font-medium mb-1">Password</label>
