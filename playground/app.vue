@@ -11,45 +11,45 @@
           class="space-y-4"
           :on-submit="onSubmit"
         >
-        <div>
-          <label class="block text-sm font-medium mb-1">Email</label>
-          <FormischField
-            :of="form"
-            :name="'email'"
-            type="email"
-            class="w-full px-3 py-2 border rounded-lg"
-          />
-          <p
-            v-if="form.errors.email"
-            class="text-red-500 text-sm mt-1"
-          >
-            {{ form.errors.email }}
-          </p>
-        </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Email</label>
+            <FormischField
+              :of="form"
+              :name="'email'"
+              type="email"
+              class="w-full px-3 py-2 border rounded-lg"
+            />
+            <p
+              v-if="form.errors.email"
+              class="text-red-500 text-sm mt-1"
+            >
+              {{ form.errors.email }}
+            </p>
+          </div>
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Password</label>
-          <FormischField
-            :of="form"
-            :name="'password'"
-            type="password"
-            class="w-full px-3 py-2 border rounded-lg"
-          />
-          <p
-            v-if="form.errors.password"
-            class="text-red-500 text-sm mt-1"
-          >
-            {{ form.errors.password }}
-          </p>
-        </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Password</label>
+            <FormischField
+              :of="form"
+              :name="'password'"
+              type="password"
+              class="w-full px-3 py-2 border rounded-lg"
+            />
+            <p
+              v-if="form.errors.password"
+              class="text-red-500 text-sm mt-1"
+            >
+              {{ form.errors.password }}
+            </p>
+          </div>
 
-        <button
-          type="submit"
-          :disabled="form.isSubmitting"
-          class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50"
-        >
-          {{ form.isSubmitting ? 'Submitting...' : 'Submit' }}
-        </button>
+          <button
+            type="submit"
+            :disabled="form.isSubmitting"
+            class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+          >
+            {{ form.isSubmitting ? 'Submitting...' : 'Submit' }}
+          </button>
         </FormischForm>
       </ClientOnly>
 
