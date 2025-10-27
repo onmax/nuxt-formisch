@@ -18,6 +18,7 @@
           <input
             v-bind="emailField.props"
             id="email"
+            v-model="emailField.input"
             name="email"
             type="email"
             class="w-full px-3 py-2 border rounded-lg"
@@ -38,6 +39,7 @@
           <input
             v-bind="passwordField.props"
             id="password"
+            v-model="passwordField.input"
             name="password"
             type="password"
             class="w-full px-3 py-2 border rounded-lg"
