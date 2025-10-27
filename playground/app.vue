@@ -248,6 +248,12 @@
         </p>
         <pre class="text-sm text-gray-700 bg-white p-3 rounded border">{{ JSON.stringify(submittedData, null, 2) }}</pre>
       </div>
+
+      <div class="mt-6 pt-6 border-t text-center text-sm text-gray-500">
+        <a href="https://github.com/onmax/nuxt-formisch" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors">
+          View on GitHub →
+        </a>
+      </div>
     </div>
   </div>
 </template>
