@@ -35,25 +35,25 @@
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
   "dependencies": {
-    "@formisch/vue": "^0.4.0",
-    "@nuxt/kit": "^4.2.0"
+    "@formisch/vue": "catalog:frontend",
+    "@nuxt/kit": "catalog:backend"
   },
   "peerDependencies": {
     "valibot": ">=1.0.0"
   },
   "devDependencies": {
-    "@nuxt/devtools": "^2.6.5",
-    "@nuxt/eslint-config": "^1.9.0",
-    "@nuxt/module-builder": "^1.0.2",
-    "@nuxt/schema": "^4.2.0",
-    "@nuxt/test-utils": "^3.19.2",
-    "@types/node": "latest",
-    "changelogen": "^0.6.2",
-    "eslint": "^9.38.0",
-    "nuxt": "^4.2.0",
-    "typescript": "~5.9.3",
-    "valibot": "^1.1.0",
-    "vitest": "^3.2.4",
-    "vue-tsc": "^3.1.1"
+    "@nuxt/devtools": "catalog:dx",
+    "@nuxt/eslint-config": "catalog:lint",
+    "@nuxt/module-builder": "catalog:build",
+    "@nuxt/schema": "catalog:backend",
+    "@nuxt/test-utils": "catalog:test",
+    "@types/node": "catalog:build",
+    "changelogen": "catalog:dx",
+    "eslint": "catalog:lint",
+    "nuxt": "catalog:frontend",
+    "typescript": "catalog:build",
+    "valibot": "catalog:inlined",
+    "vitest": "catalog:test",
+    "vue-tsc": "catalog:build"
   }
 }

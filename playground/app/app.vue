@@ -34,77 +34,45 @@
       >
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label
-              for="name"
-              class="block text-sm font-medium mb-1"
-            >Name</label>
+            <label for="name" class="block text-sm font-medium mb-1">Name</label>
             <input
-              v-bind="nameField.props"
               id="name"
               v-model="nameField.input"
-              name="name"
               type="text"
               class="w-full px-3 py-2 border rounded-lg"
             >
-            <p
-              v-if="nameField.errors"
-              class="text-red-500 text-sm mt-1"
-            >
+            <p v-if="nameField.errors" class="text-red-500 text-sm mt-1">
               {{ nameField.errors[0] }}
             </p>
           </div>
 
           <div>
-            <label
-              for="email"
-              class="block text-sm font-medium mb-1"
-            >Email</label>
+            <label for="email" class="block text-sm font-medium mb-1">Email</label>
             <input
-              v-bind="emailField.props"
               id="email"
               v-model="emailField.input"
-              name="email"
               type="email"
               class="w-full px-3 py-2 border rounded-lg"
             >
-            <p
-              v-if="emailField.errors"
-              class="text-red-500 text-sm mt-1"
-            >
+            <p v-if="emailField.errors" class="text-red-500 text-sm mt-1">
               {{ emailField.errors[0] }}
             </p>
           </div>
         </div>
 
         <div>
-          <label
-            for="role"
-            class="block text-sm font-medium mb-1"
-          >Role</label>
+          <label for="role" class="block text-sm font-medium mb-1">Role</label>
           <select
-            v-bind="roleField.props"
             id="role"
             v-model="roleField.input"
-            name="role"
             class="w-full px-3 py-2 border rounded-lg"
           >
-            <option value="developer">
-              Developer
-            </option>
-            <option value="designer">
-              Designer
-            </option>
-            <option value="manager">
-              Product Manager
-            </option>
-            <option value="other">
-              Other
-            </option>
+            <option value="developer">Developer</option>
+            <option value="designer">Designer</option>
+            <option value="manager">Product Manager</option>
+            <option value="other">Other</option>
           </select>
-          <p
-            v-if="roleField.errors"
-            class="text-red-500 text-sm mt-1"
-          >
+          <p v-if="roleField.errors" class="text-red-500 text-sm mt-1">
             {{ roleField.errors[0] }}
           </p>
         </div>
@@ -113,168 +81,93 @@
           <label class="block text-sm font-medium mb-2">Experience Level</label>
           <div class="flex gap-4">
             <label class="flex items-center">
-              <input
-                v-bind="experienceField.props"
-                v-model="experienceField.input"
-                type="radio"
-                name="experience"
-                value="junior"
-                class="mr-2"
-              >
+              <input v-model="experienceField.input" type="radio" value="junior" class="mr-2">
               Junior
             </label>
             <label class="flex items-center">
-              <input
-                v-bind="experienceField.props"
-                v-model="experienceField.input"
-                type="radio"
-                name="experience"
-                value="mid"
-                class="mr-2"
-              >
+              <input v-model="experienceField.input" type="radio" value="mid" class="mr-2">
               Mid
             </label>
             <label class="flex items-center">
-              <input
-                v-bind="experienceField.props"
-                v-model="experienceField.input"
-                type="radio"
-                name="experience"
-                value="senior"
-                class="mr-2"
-              >
+              <input v-model="experienceField.input" type="radio" value="senior" class="mr-2">
               Senior
             </label>
             <label class="flex items-center">
-              <input
-                v-bind="experienceField.props"
-                v-model="experienceField.input"
-                type="radio"
-                name="experience"
-                value="lead"
-                class="mr-2"
-              >
+              <input v-model="experienceField.input" type="radio" value="lead" class="mr-2">
               Lead
             </label>
           </div>
-          <p
-            v-if="experienceField.errors"
-            class="text-red-500 text-sm mt-1"
-          >
+          <p v-if="experienceField.errors" class="text-red-500 text-sm mt-1">
             {{ experienceField.errors[0] }}
           </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label
-              for="age"
-              class="block text-sm font-medium mb-1"
-            >Age</label>
+            <label for="age" class="block text-sm font-medium mb-1">Age</label>
             <input
-              v-bind="ageField.props"
               id="age"
               v-model.number="ageField.input"
-              name="age"
               type="number"
               class="w-full px-3 py-2 border rounded-lg"
             >
-            <p
-              v-if="ageField.errors"
-              class="text-red-500 text-sm mt-1"
-            >
+            <p v-if="ageField.errors" class="text-red-500 text-sm mt-1">
               {{ ageField.errors[0] }}
             </p>
           </div>
 
           <div>
-            <label
-              for="startDate"
-              class="block text-sm font-medium mb-1"
-            >Start Date</label>
+            <label for="startDate" class="block text-sm font-medium mb-1">Start Date</label>
             <input
-              v-bind="startDateField.props"
               id="startDate"
               v-model="startDateField.input"
-              name="startDate"
               type="date"
               class="w-full px-3 py-2 border rounded-lg"
             >
-            <p
-              v-if="startDateField.errors"
-              class="text-red-500 text-sm mt-1"
-            >
+            <p v-if="startDateField.errors" class="text-red-500 text-sm mt-1">
               {{ startDateField.errors[0] }}
             </p>
           </div>
         </div>
 
         <div>
-          <label
-            for="avatar"
-            class="block text-sm font-medium mb-1"
-          >Avatar URL (optional)</label>
+          <label for="avatar" class="block text-sm font-medium mb-1">Avatar URL (optional)</label>
           <input
-            v-bind="avatarField.props"
             id="avatar"
             v-model="avatarField.input"
-            name="avatar"
             type="url"
             placeholder="https://example.com/avatar.jpg"
             class="w-full px-3 py-2 border rounded-lg"
           >
-          <p
-            v-if="avatarField.errors"
-            class="text-red-500 text-sm mt-1"
-          >
+          <p v-if="avatarField.errors" class="text-red-500 text-sm mt-1">
             {{ avatarField.errors[0] }}
           </p>
-          <p
-            v-if="avatarField.input"
-            class="text-sm text-gray-500 mt-2"
-          >
-            Preview: <img
-              :src="avatarField.input"
-              alt="Avatar preview"
-              class="inline-block size-10 rounded-full ml-2"
-            >
+          <p v-if="avatarField.input" class="text-sm text-gray-500 mt-2">
+            Preview: <img :src="avatarField.input" alt="Avatar preview" class="inline-block size-10 rounded-full ml-2">
           </p>
         </div>
 
         <div>
-          <label
-            for="bio"
-            class="block text-sm font-medium mb-1"
-          >Bio</label>
+          <label for="bio" class="block text-sm font-medium mb-1">Bio</label>
           <textarea
-            v-bind="bioField.props"
             id="bio"
             v-model="bioField.input"
-            name="bio"
             rows="4"
             class="w-full px-3 py-2 border rounded-lg"
           />
-          <p
-            v-if="bioField.errors"
-            class="text-red-500 text-sm mt-1"
-          >
+          <p v-if="bioField.errors" class="text-red-500 text-sm mt-1">
             {{ bioField.errors[0] }}
           </p>
         </div>
 
         <div class="flex items-center">
           <input
-            v-bind="newsletterField.props"
             id="newsletter"
             v-model="newsletterField.input"
-            name="newsletter"
             type="checkbox"
             class="h-4 w-4 text-blue-600 border-gray-300 rounded"
           >
-          <label
-            for="newsletter"
-            class="ml-2 block text-sm"
-          >
+          <label for="newsletter" class="ml-2 block text-sm">
             Subscribe to newsletter
           </label>
         </div>
@@ -323,16 +216,24 @@
 </template>
 
 <script setup lang="ts">
+import { profileSchema, type ProfileInput } from '#shared/utils/schemas'
+
 useHead({ title: 'Formisch + Nuxt Demo' })
 
-// profileSchema is auto-imported
 const submitted = ref(false)
 const submittedData = ref()
 const error = ref('')
 const serverOnlyValidation = ref(false)
 
+const schema = computed(() => {
+  if (import.meta.client) {
+    return serverOnlyValidation.value ? undefined : profileSchema
+  }
+  return undefined
+})
+
 const form = useForm({
-  schema: computed(() => serverOnlyValidation.value ? undefined : profileSchema),
+  schema,
   initialValues: {
     name: 'John Doe',
     email: 'john@example.com',
@@ -356,7 +257,7 @@ const avatarField = useField(() => form, () => ({ path: ['avatar'] as const }))
 const bioField = useField(() => form, () => ({ path: ['bio'] as const }))
 const newsletterField = useField(() => form, () => ({ path: ['newsletter'] as const }))
 
-const onSubmit: SubmitHandler<typeof profileSchema> = async (values: ProfileInput) => {
+const onSubmit = async (values: ProfileInput) => {
   try {
     error.value = ''
     submitted.value = false

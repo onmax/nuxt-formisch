@@ -1,4 +1,4 @@
-import { profileSchema } from '~/utils/schemas'
+import { profileSchema } from '#shared/utils/schemas'
 
 export default defineEventHandler(async (event) => {
   // useFormValidation is auto-imported by the module

@@ -1,2 +1,39 @@
 packages:
   - 'playground'
+
+catalogs:
+  test:
+    vitest: ^3.2.4
+    '@nuxt/test-utils': ^3.20.1
+    '@playwright/test': ^1.56.1
+    '@vue/test-utils': ^2.4.6
+    'happy-dom': ^20.0.8
+    'playwright-core': ^1.56.1
+
+  lint:
+    eslint: ^9.38.0
+    '@nuxt/eslint-config': ^1.9.0
+
+  build:
+    '@nuxt/module-builder': ^1.0.2
+    '@types/node': latest
+    typescript: ~5.9.3
+    'vue-tsc': ^3.1.1
+
+  frontend:
+    nuxt: ^4.2.0
+    '@formisch/vue': ^0.4.0
+
+  backend:
+    '@nuxt/kit': ^4.2.0
+    '@nuxt/schema': ^4.2.0
+
+  inlined:
+    valibot: ^1.1.0
+
+  ui:
+    '@nuxtjs/tailwindcss': ^6.14.0
+
+  dx:
+    '@nuxt/devtools': ^2.6.5
+    changelogen: ^0.6.2
