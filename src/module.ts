@@ -38,10 +38,10 @@ export default defineNuxtModule<ModuleOptions>({
       addImports({ name, from: '@formisch/vue', type: true })
     })
 
-    // Auto-import components
+    // Auto-import components with F prefix
     const components = ['Form', 'Field', 'FieldArray']
     components.forEach((name) => {
-      addComponent({ name: `Formisch${name}`, export: name, filePath: '@formisch/vue' })
+      addComponent({ name: `F${name}`, export: name, filePath: '@formisch/vue' })
     })
 
     // Server-side composables

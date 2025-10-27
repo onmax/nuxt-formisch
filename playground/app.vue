@@ -27,7 +27,7 @@
         </label>
       </div>
 
-      <FormischForm
+      <FForm
         :of="form"
         class="space-y-6"
         :on-submit="onSubmit"
@@ -286,7 +286,7 @@
         >
           {{ form.isSubmitting ? 'Saving...' : 'Save Profile' }}
         </button>
-      </FormischForm>
+      </FForm>
 
       <div
         v-if="error"
@@ -356,7 +356,7 @@ const avatarField = useField(() => form, () => ({ path: ['avatar'] as const }))
 const bioField = useField(() => form, () => ({ path: ['bio'] as const }))
 const newsletterField = useField(() => form, () => ({ path: ['newsletter'] as const }))
 
-const onSubmit = async (values: unknown) => {
+const onSubmit: SubmitHandler<typeof profileSchema> = async (values) => {
   try {
     error.value = ''
     submitted.value = false
