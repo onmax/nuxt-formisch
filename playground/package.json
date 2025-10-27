@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@nuxt/test-utils": "catalog:test",
-    "@nuxtjs/tailwindcss": "catalog:ui",
+    "@nuxt/ui": "catalog:ui",
     "@playwright/test": "catalog:test",
     "@vue/test-utils": "catalog:test",
     "happy-dom": "catalog:test",
