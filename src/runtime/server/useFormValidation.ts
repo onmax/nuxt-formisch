@@ -1,6 +1,6 @@
 import type { H3Event } from 'h3'
+import type { BaseIssue, BaseSchema, InferOutput } from 'valibot'
 import { readValidatedBody } from 'h3'
-import type { BaseSchema, BaseIssue, InferOutput } from 'valibot'
 import { parse } from 'valibot'
 
 /**

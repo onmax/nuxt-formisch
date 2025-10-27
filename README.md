@@ -35,13 +35,6 @@ export default defineNuxtConfig({
 Create forms without imports:
 
 ```vue
-<template>
-  <FormischForm :of="form" :on-submit="onSubmit">
-    <FormischField :of="form" name="email" type="email" />
-    <button type="submit">Submit</button>
-  </FormischForm>
-</template>
-
 <script setup lang="ts">
 import * as v from 'valibot'
 
@@ -56,6 +49,15 @@ const onSubmit: SubmitHandler<typeof schema> = async (values) => {
   console.log(values) // Fully typed!
 }
 </script>
+
+<template>
+  <FormischForm :of="form" :on-submit="onSubmit">
+    <FormischField :of="form" name="email" type="email" />
+    <button type="submit">
+      Submit
+    </button>
+  </FormischForm>
+</template>
 ```
 
 ## Server-Side Validation
@@ -95,14 +97,6 @@ export default defineEventHandler(async (event) => {
 ### 3. Use same schema in frontend
 
 ```vue
-<template>
-  <FormischForm :of="form" :on-submit="onSubmit">
-    <FormischField :of="form" name="email" type="email" />
-    <FormischField :of="form" name="password" type="password" />
-    <button type="submit">Login</button>
-  </FormischForm>
-</template>
-
 <script setup lang="ts">
 // SubmitHandler and loginSchema are auto-imported
 const form = useForm({ schema: loginSchema })
@@ -111,6 +105,16 @@ const onSubmit: SubmitHandler<typeof loginSchema> = async (values) => {
   await $fetch('/api/login', { method: 'POST', body: values })
 }
 </script>
+
+<template>
+  <FormischForm :of="form" :on-submit="onSubmit">
+    <FormischField :of="form" name="email" type="email" />
+    <FormischField :of="form" name="password" type="password" />
+    <button type="submit">
+      Login
+    </button>
+  </FormischForm>
+</template>
 ```
 
 ## Auto-imported
