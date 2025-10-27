@@ -5,53 +5,61 @@
         Formisch + Nuxt
       </h1>
 
-      <ClientOnly>
-        <FormischForm
+      <FormischForm
+        :of="form"
+        class="space-y-4"
+        :on-submit="onSubmit"
+      >
+        <FormischField
+          v-slot="field"
           :of="form"
-          class="space-y-4"
-          :on-submit="onSubmit"
+          :name="'email'"
         >
           <div>
             <label class="block text-sm font-medium mb-1">Email</label>
-            <FormischField
-              :of="form"
-              :name="'email'"
+            <input
+              v-bind="field.props"
               type="email"
               class="w-full px-3 py-2 border rounded-lg"
-            />
+            >
             <p
-              v-if="form.errors.email"
+              v-if="field.errors"
               class="text-red-500 text-sm mt-1"
             >
-              {{ form.errors.email }}
+              {{ field.errors[0] }}
             </p>
           </div>
+        </FormischField>
 
+        <FormischField
+          v-slot="field"
+          :of="form"
+          :name="'password'"
+        >
           <div>
             <label class="block text-sm font-medium mb-1">Password</label>
-            <FormischField
-              :of="form"
-              :name="'password'"
+            <input
+              v-bind="field.props"
               type="password"
               class="w-full px-3 py-2 border rounded-lg"
-            />
+            >
             <p
-              v-if="form.errors.password"
+              v-if="field.errors"
               class="text-red-500 text-sm mt-1"
             >
-              {{ form.errors.password }}
+              {{ field.errors[0] }}
             </p>
           </div>
+        </FormischField>
 
-          <button
-            type="submit"
-            :disabled="form.isSubmitting"
-            class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50"
-          >
-            {{ form.isSubmitting ? 'Submitting...' : 'Submit' }}
-          </button>
-        </FormischForm>
-      </ClientOnly>
+        <button
+          type="submit"
+          :disabled="form.isSubmitting"
+          class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+        >
+          {{ form.isSubmitting ? 'Submitting...' : 'Submit' }}
+        </button>
+      </FormischForm>
 
       <div
         v-if="error"
