@@ -1,6 +1,6 @@
 {
   "name": "nuxt-formisch",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Formisch integration for Nuxt - schema-based, headless form library",
   "repository": "formisch/nuxt",
   "license": "MIT",
