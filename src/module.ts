@@ -3,19 +3,29 @@ import { defineNuxtModule, addComponent, addImports, addServerImports, createRes
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ModuleOptions {}
 
+function isPackageInstalled(name: string): boolean {
+  try {
+    require.resolve(name)
+    return true
+  }
+  catch {
+    return false
+  }
+}
+
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: 'formisch',
     configKey: 'formisch',
   },
   defaults: {},
-  setup(_options, nuxt) {
+  setup(_options, _nuxt) {
     const resolver = createResolver(import.meta.url)
 
     // Check for schema library
-    const hasValibot = nuxt.options._installedModules?.some(m => m.meta?.name === 'valibot')
-    const hasZod = nuxt.options._installedModules?.some(m => m.meta?.name === 'zod')
-    const hasArktype = nuxt.options._installedModules?.some(m => m.meta?.name === 'arktype')
+    const hasValibot = isPackageInstalled('valibot')
+    const hasZod = isPackageInstalled('zod')
+    const hasArktype = isPackageInstalled('arktype')
 
     if (!hasValibot && !hasZod && !hasArktype) {
       logger.warn('Formisch requires a schema library. Install: valibot (recommended), zod, or arktype')
