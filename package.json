@@ -2,7 +2,7 @@
   "name": "nuxt-formisch",
   "version": "0.0.4",
   "description": "Formisch integration for Nuxt - schema-based, headless form library",
-  "repository": "formisch/nuxt",
+  "repository": { "type": "git", "url": "git+https://github.com/formisch/nuxt.git" },
   "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@10.19.0",
