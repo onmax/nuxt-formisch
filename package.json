@@ -37,7 +37,8 @@
   },
   "dependencies": {
     "@formisch/vue": "catalog:frontend",
-    "@nuxt/kit": "catalog:backend"
+    "@nuxt/kit": "catalog:backend",
+    "@standard-schema/spec": "^1.0.0"
   },
   "peerDependencies": {
     "valibot": ">=1.0.0"

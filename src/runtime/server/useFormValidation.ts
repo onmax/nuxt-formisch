@@ -1,11 +1,10 @@
 import type { H3Event } from 'h3'
-import { readValidatedBody } from 'h3'
-import type { BaseSchema, BaseIssue, InferOutput } from 'valibot'
-import { parse } from 'valibot'
+import { createError, readValidatedBody } from 'h3'
+import type { StandardSchemaV1 } from '@standard-schema/spec'
 
 /**
  * Server-side form validation composable
- * Validates request body against a Valibot schema using h3's readValidatedBody
+ * Validates request body against any Standard Schema library (Valibot, Zod, ArkType)
  *
  * @example
  * ```ts
@@ -15,10 +14,15 @@ import { parse } from 'valibot'
  * })
  * ```
  */
-export async function useFormValidation<TSchema extends BaseSchema<unknown, unknown, BaseIssue<unknown>>>(
+export async function useFormValidation<T>(
   event: H3Event,
-  schema: TSchema,
-): Promise<InferOutput<TSchema>> {
-  // Wrap Valibot schema in a validation function for h3
-  return await readValidatedBody(event, data => parse(schema, data))
+  schema: StandardSchemaV1<unknown, T>,
+): Promise<T> {
+  return await readValidatedBody(event, async (data) => {
+    const result = await schema['~standard'].validate(data)
+    if (result.issues) {
+      throw createError({ statusCode: 400, data: { issues: result.issues } })
+    }
+    return result.value
+  })
 }

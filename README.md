@@ -10,9 +10,11 @@ Formisch integration for Nuxt - schema-based, headless form library
 ## Features
 
 - 🚀 Auto-imports `useForm`, `useField`, `useFieldArray` composables
+- 🎯 `useFormFields` for simplified field binding
 - 🎨 Auto-imports `FForm`, `FField`, `FFieldArray` components
 - 📦 Auto-imports all Formisch methods (`focus`, `reset`, `validate`, etc.)
-- 🔒 Server-side validation with `useFormValidation` composable
+- 🔒 Server validation with Standard Schema (Valibot, Zod, ArkType)
+- 🎨 `useNuxtUIField` for Nuxt UI integration
 - ✨ Zero-config setup
 - 🔥 Full TypeScript support
 - ⚡️ Leverages @formisch/vue under the hood
@@ -38,8 +40,8 @@ Create forms with minimal boilerplate:
 ```vue
 <template>
   <FForm :of="form" :on-submit="(values) => onSubmit(values)">
-    <input v-model="emailField.input" type="email" />
-    <p v-if="emailField.errors">{{ emailField.errors[0] }}</p>
+    <input v-model="email.input" type="email" />
+    <p v-if="email.errors">{{ email.errors[0] }}</p>
     <button type="submit">Submit</button>
   </FForm>
 </template>
@@ -52,7 +54,8 @@ const schema = v.object({
 })
 
 const form = useForm({ schema })
-const emailField = useField(() => form, () => ({ path: ['email'] as const }))
+const { field } = useFormFields(form)
+const email = field('email')
 
 async function onSubmit(values: v.InferOutput<typeof schema>) {
   console.log(values) // Fully typed!
@@ -94,30 +97,30 @@ export default defineEventHandler(async (event) => {
 })
 ```
 
-> **Note:** `useFormValidation` uses h3's `readValidatedBody` which supports Standard-Schema compatible validators. Validation errors automatically return 400 status with error details.
+> `useFormValidation` supports any Standard Schema library: Valibot, Zod, or ArkType. Validation errors return 400 with issue details.
 
 ### 3. Use same schema in frontend
 
 ```vue
 <template>
   <FForm :of="form" :on-submit="(values) => onSubmit(values)">
-    <input v-model="emailField.input" type="email" />
-    <p v-if="emailField.errors">{{ emailField.errors[0] }}</p>
+    <input v-model="email.input" type="email" />
+    <p v-if="email.errors">{{ email.errors[0] }}</p>
 
-    <input v-model="passwordField.input" type="password" />
-    <p v-if="passwordField.errors">{{ passwordField.errors[0] }}</p>
+    <input v-model="password.input" type="password" />
+    <p v-if="password.errors">{{ password.errors[0] }}</p>
 
     <button type="submit">Login</button>
   </FForm>
 </template>
 
 <script setup lang="ts">
-// loginSchema is auto-imported from #shared/utils/schemas
 import type { LoginOutput } from '#shared/utils/schemas'
 
 const form = useForm({ schema: loginSchema })
-const emailField = useField(() => form, () => ({ path: ['email'] as const }))
-const passwordField = useField(() => form, () => ({ path: ['password'] as const }))
+const { field } = useFormFields(form)
+const email = field('email')
+const password = field('password')
 
 async function onSubmit(values: LoginOutput) {
   await $fetch('/api/login', { method: 'POST', body: values })
@@ -129,9 +132,11 @@ async function onSubmit(values: LoginOutput) {
 
 ### Client Composables
 - `useForm`, `useField`, `useFieldArray`
+- `useFormFields` - simplified field creation helper
+- `useNuxtUIField` - Nuxt UI integration (when @nuxt/ui installed)
 
 ### Server Composables
-- `useFormValidation` - validates request body against schema
+- `useFormValidation` - validates request body against any Standard Schema
 
 ### Components
 - `FForm`, `FField`, `FFieldArray` (prefixed with F)
@@ -144,30 +149,45 @@ async function onSubmit(values: LoginOutput) {
 
 ## Nuxt UI Integration
 
-Works seamlessly with Nuxt UI v4. Wrap fields with `UFormField` for labels & errors, bind field state to Nuxt UI inputs:
+Works seamlessly with Nuxt UI v4. Use `useNuxtUIField` to bridge Formisch fields to Nuxt UI props:
 
 ```vue
 <template>
   <FForm :of="form" :on-submit="onSubmit">
-    <UFormField label="Email" :error="emailField.errors?.[0]">
-      <UInput v-model="emailField.input" type="email" />
+    <UFormField label="Email" :error="email.error.value">
+      <UInput v-model="email.modelValue.value" type="email" />
     </UFormField>
 
-    <UFormField label="Role" :error="roleField.errors?.[0]">
-      <USelect v-model="roleField.input" :items="roles" />
+    <UFormField label="Role" :error="role.error.value">
+      <USelect v-model="role.modelValue.value" :items="roles" />
     </UFormField>
 
-    <UCheckbox v-model="newsletterField.input" label="Subscribe" />
     <UButton type="submit" :loading="form.isSubmitting">Submit</UButton>
   </FForm>
 </template>
 
 <script setup lang="ts">
 const form = useForm({ schema })
-const emailField = useField(() => form, () => ({ path: ['email'] as const }))
-const roleField = useField(() => form, () => ({ path: ['role'] as const }))
-const newsletterField = useField(() => form, () => ({ path: ['newsletter'] as const }))
+const { field } = useFormFields(form)
+const email = useNuxtUIField(field('email'))
+const role = useNuxtUIField(field('role'))
 </script>
+```
+
+Or access field state directly without the helper:
+
+```vue
+<script setup lang="ts">
+const form = useForm({ schema })
+const { field } = useFormFields(form)
+const emailField = field('email')
+</script>
+
+<template>
+  <UFormField label="Email" :error="emailField.errors?.[0]">
+    <UInput v-model="emailField.input" type="email" />
+  </UFormField>
+</template>
 ```
 
 ## Demo
