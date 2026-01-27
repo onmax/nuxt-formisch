@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "auto-form-fixture",
+  "type": "module",
+  "dependencies": {
+    "nuxt": "catalog:frontend",
+    "valibot": "catalog:inlined"
+  },
+  "devDependencies": {
+    "@nuxt/ui": "catalog:ui"
+  }
+}
