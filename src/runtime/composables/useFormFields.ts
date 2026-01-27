@@ -1,5 +1,5 @@
 import type { FormStore, Schema } from '@formisch/vue'
-import { useField } from '@formisch/vue'
+import { useField } from '#imports'
 
 type FieldElementProps = { ref: (el: unknown) => void, name: string, onBlur: () => void }
 

@@ -1,6 +1,8 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { defineNuxtModule, addComponent, addComponentsDir, addImports, addServerImports, createResolver, logger } from '@nuxt/kit'
+import { defineNuxtModule, addComponent, addComponentsDir, addImports, addServerImports, createResolver, useLogger } from '@nuxt/kit'
+
+const logger = useLogger('formisch')
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ModuleOptions {}
@@ -21,6 +23,7 @@ export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: 'formisch',
     configKey: 'formisch',
+    compatibility: { nuxt: '>=3.0.0' },
   },
   defaults: {},
   setup(_options, _nuxt) {
@@ -61,7 +64,7 @@ export default defineNuxtModule<ModuleOptions>({
         from: resolver.resolve('./runtime/composables/useNuxtUIField'),
       })
       addImports({
-        name: 'useSchemaIntrospection',
+        name: 'introspectSchema',
         from: resolver.resolve('./runtime/composables/useSchemaIntrospection'),
       })
       const autoFormTypes = ['ResolvedField', 'FieldConfig', 'FieldConstraints', 'FieldUI']

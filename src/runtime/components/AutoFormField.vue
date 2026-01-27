@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { computed, resolveComponent, h } from 'vue'
+import { computed, resolveComponent, h, useAppConfig } from '#imports'
 import type { ResolvedField, FieldConfig } from '../composables/useSchemaIntrospection'
 import { formatLabel } from '../utils/formatLabel'
+import theme from '../theme/autoFormField'
+
+type SlotKeys = 'root' | 'wrapper' | 'unit'
 
 const props = defineProps<{
   field: ResolvedField
@@ -9,11 +12,26 @@ const props = defineProps<{
   error?: string
   disabled?: boolean
   fieldConfig?: FieldConfig
+  class?: string
+  ui?: Partial<Record<SlotKeys, string>>
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: unknown]
 }>()
+
+// Resolve components once at setup time and warn if missing
+const USwitch = resolveComponent('USwitch')
+const USelect = resolveComponent('USelect')
+const UInput = resolveComponent('UInput')
+const UFormField = resolveComponent('UFormField')
+
+if (import.meta.dev) {
+  if (typeof USwitch === 'string') console.warn('[formisch] USwitch not found. Install @nuxt/ui')
+  if (typeof USelect === 'string') console.warn('[formisch] USelect not found. Install @nuxt/ui')
+  if (typeof UInput === 'string') console.warn('[formisch] UInput not found. Install @nuxt/ui')
+  if (typeof UFormField === 'string') console.warn('[formisch] UFormField not found. Install @nuxt/ui')
+}
 
 const value = computed({
   get: () => props.modelValue,
@@ -32,6 +50,17 @@ const placeholder = computed(() => props.fieldConfig?.placeholder || props.field
 const unit = computed(() => props.fieldConfig?.unit || props.field.ui.unit)
 const isDisabled = computed(() => props.disabled || props.fieldConfig?.disabled)
 
+const appConfig = useAppConfig()
+const slots = computed(() => {
+  const tv = theme()
+  const appUi = (appConfig.ui as { autoFormField?: Partial<Record<SlotKeys, string>> } | undefined)?.autoFormField
+  return {
+    root: [tv.root(), appUi?.root, props.ui?.root, props.class].filter(Boolean).join(' '),
+    wrapper: [tv.wrapper(), appUi?.wrapper, props.ui?.wrapper].filter(Boolean).join(' '),
+    unit: [tv.unit(), appUi?.unit, props.ui?.unit].filter(Boolean).join(' '),
+  }
+})
+
 function renderInput() {
   // Custom component override
   if (props.fieldConfig?.component) {
@@ -46,7 +75,6 @@ function renderInput() {
   const f = props.field
 
   if (f.type === 'boolean') {
-    const USwitch = resolveComponent('USwitch')
     return h(USwitch, {
       'modelValue': value.value,
       'onUpdate:modelValue': (v: unknown) => { value.value = v },
@@ -55,7 +83,6 @@ function renderInput() {
   }
 
   if (f.type === 'picklist' || f.type === 'enum') {
-    const USelect = resolveComponent('USelect')
     return h(USelect, {
       'modelValue': value.value,
       'onUpdate:modelValue': (v: unknown) => { value.value = v },
@@ -66,11 +93,11 @@ function renderInput() {
   }
 
   // Default: UInput
-  const UInput = resolveComponent('UInput')
   const inputProps: Record<string, unknown> = {
     'modelValue': value.value,
     'onUpdate:modelValue': (v: unknown) => {
-      value.value = f.type === 'number' ? Number(v) : v
+      const num = Number(v)
+      value.value = f.type === 'number' ? (Number.isNaN(num) ? undefined : num) : v
     },
     'type': inputType.value,
     'placeholder': placeholder.value,
@@ -89,18 +116,19 @@ function renderInput() {
 
 <template>
   <component
-    :is="resolveComponent('UFormField')"
+    :is="UFormField"
     :label="label"
     :description="description"
     :error="error"
     :required="field.required"
+    :class="slots.root"
   >
     <template #default>
-      <div class="flex items-center gap-2">
+      <div :class="slots.wrapper">
         <component :is="renderInput()" />
         <span
           v-if="unit"
-          class="text-sm text-muted"
+          :class="slots.unit"
         >{{ unit }}</span>
       </div>
     </template>

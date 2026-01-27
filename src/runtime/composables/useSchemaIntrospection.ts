@@ -61,8 +61,9 @@ function unwrapSchema(schema: SchemaLike): { inner: SchemaLike, required: boolea
   let required = true
   let current = schema
   while (current.type === 'optional' || current.type === 'nullable' || current.type === 'nullish') {
+    if (!current.wrapped) break
     required = false
-    current = current.wrapped!
+    current = current.wrapped
   }
   return { inner: current, required }
 }
@@ -186,9 +187,9 @@ function applyFieldConfig(fields: ResolvedField[], config?: Record<string, Field
   })
 }
 
-export function useSchemaIntrospection(schema: SchemaLike, fieldConfig?: Record<string, FieldConfig>): ResolvedField[] {
+export function introspectSchema(schema: SchemaLike, fieldConfig?: Record<string, FieldConfig>): ResolvedField[] {
   if (schema.type !== 'object' || !schema.entries)
-    throw new Error('useSchemaIntrospection expects a valibot object schema')
+    throw new Error('introspectSchema expects a valibot object schema')
 
   // Unwrap pipe if present (v.pipe(v.object({...}), ...))
   const entries = schema.entries as Record<string, SchemaLike>

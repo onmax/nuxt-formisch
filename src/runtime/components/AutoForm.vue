@@ -1,32 +1,30 @@
 <script setup lang="ts">
-import { computed, reactive, ref, toRaw, watchEffect } from 'vue'
-import { useForm, useField } from '@formisch/vue'
+import { computed, ref, toRaw, useForm, useField, useAppConfig } from '#imports'
 import type { Schema } from '@formisch/vue'
-import { useSchemaIntrospection } from '../composables/useSchemaIntrospection'
+import { introspectSchema } from '../composables/useSchemaIntrospection'
 import type { FieldConfig, ResolvedField } from '../composables/useSchemaIntrospection'
+import theme from '../theme/autoForm'
 import AutoFormField from './AutoFormField.vue'
 import AutoFormObject from './AutoFormObject.vue'
 import AutoFormArray from './AutoFormArray.vue'
+
+type SlotKeys = 'root' | 'section' | 'sectionTitle' | 'grid'
 
 const props = withDefaults(defineProps<{
   schema: Schema
   initialValues?: Record<string, unknown>
   fieldConfig?: Record<string, FieldConfig>
   disabled?: boolean
-  columns?: number
+  columns?: 1 | 2 | 3 | 4
   validateOn?: 'blur' | 'input' | 'change'
+  class?: string
+  ui?: Partial<Record<SlotKeys, string>>
 }>(), { columns: 1, validateOn: 'blur' })
 
 const emit = defineEmits<{
   submit: [data: Record<string, unknown>]
   error: [errors: Record<string, string>]
 }>()
-
-// Introspect schema into resolved fields
-const resolvedFields = computed(() =>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  useSchemaIntrospection(props.schema as any, props.fieldConfig),
-)
 
 // Create formisch form store
 const form = useForm({
@@ -35,11 +33,22 @@ const form = useForm({
   initialInput: props.initialValues as any,
 })
 
-// Track fields reactively using useField per top-level key
-function useAutoField(name: string) {
+// Introspect schema once at setup time to get all field names
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const initialFields = introspectSchema(props.schema as any)
+
+// Create field stores for all schema fields at setup time (composables must be called at top level)
+const fieldStores: Record<string, ReturnType<typeof useField>> = {}
+for (const f of initialFields) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (useField as any)(() => form, () => ({ path: [name] as const }))
+  fieldStores[f.name] = (useField as any)(() => form, () => ({ path: [f.name] as const }))
 }
+
+// Resolved fields with fieldConfig applied (re-computed when fieldConfig changes)
+const resolvedFields = computed(() =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  introspectSchema(props.schema as any, props.fieldConfig),
+)
 
 // Dirty tracking
 const isDirty = computed(() => form.isDirty)
@@ -68,16 +77,6 @@ const sections = computed(() => {
   return map
 })
 
-// Collect field stores reactively (avoid calling composables inside computed)
-const fieldStores = reactive<Record<string, ReturnType<typeof useAutoField>>>({})
-watchEffect(() => {
-  for (const f of resolvedFields.value) {
-    if (!fieldStores[f.name]) {
-      fieldStores[f.name] = useAutoField(f.name)
-    }
-  }
-})
-
 const flatErrors = computed(() => {
   const errors: Record<string, string> = {}
   for (const [name, store] of Object.entries(fieldStores)) {
@@ -86,8 +85,17 @@ const flatErrors = computed(() => {
   return errors
 })
 
-const GRID_COLS: Record<number, string> = { 1: 'grid gap-4 grid-cols-1', 2: 'grid gap-4 grid-cols-2', 3: 'grid gap-4 grid-cols-3', 4: 'grid gap-4 grid-cols-4' }
-const gridClass = computed(() => GRID_COLS[props.columns] || GRID_COLS[1])
+const appConfig = useAppConfig()
+const slots = computed(() => {
+  const tv = theme({ columns: props.columns })
+  const appUi = (appConfig.ui as { autoForm?: Partial<Record<SlotKeys, string>> } | undefined)?.autoForm
+  return {
+    root: [tv.root(), appUi?.root, props.ui?.root, props.class].filter(Boolean).join(' '),
+    section: [tv.section(), appUi?.section, props.ui?.section].filter(Boolean).join(' '),
+    sectionTitle: [tv.sectionTitle(), appUi?.sectionTitle, props.ui?.sectionTitle].filter(Boolean).join(' '),
+    grid: [tv.grid(), appUi?.grid, props.ui?.grid].filter(Boolean).join(' '),
+  }
+})
 
 function colSpanStyle(field: ResolvedField) {
   const span = props.fieldConfig?.[field.name]?.colSpan
@@ -126,7 +134,7 @@ async function handleSubmit() {
 
 <template>
   <form @submit.prevent="handleSubmit">
-    <div class="space-y-6">
+    <div :class="slots.root">
       <template
         v-for="[sectionName, sectionFields] in sections"
         :key="sectionName"
@@ -135,14 +143,14 @@ async function handleSubmit() {
           :name="`section:${sectionName}`"
           :fields="sectionFields"
         >
-          <div>
+          <div :class="slots.section">
             <h3
               v-if="sectionName"
-              class="text-lg font-medium mb-3"
+              :class="slots.sectionTitle"
             >
               {{ sectionName }}
             </h3>
-            <div :class="gridClass">
+            <div :class="slots.grid">
               <template
                 v-for="field in sectionFields"
                 :key="field.name"

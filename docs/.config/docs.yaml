@@ -1,3 +1,19 @@
 name: nuxt-formisch
+shortDescription: Schema-based, headless form library for Nuxt
+description: Formisch integration for Nuxt - schema-based, headless form library
+url: https://nuxt-formisch.onmax.me
 github: onmax/nuxt-formisch
 themeColor: "#00DC82"
+landing:
+  contributors: true
+  heroLinks:
+    primary:
+      label: Get Started
+      icon: i-heroicons-rocket-launch
+      to: /guide
+      order: 0
+    demo:
+      label: Live Demo
+      icon: i-heroicons-play
+      to: https://demo-nuxt-formisch.onmax.me
+      order: 1
