@@ -48,6 +48,13 @@ export default defineNuxtModule<ModuleOptions>({
       from: resolver.resolve('./runtime/composables/useFormFields'),
     })
 
+    if (hasValibot) {
+      addImports({
+        name: 'jsonToValibotSchema',
+        from: resolver.resolve('./runtime/composables/useJsonToSchema'),
+      })
+    }
+
     if (hasNuxtUI) {
       addImports({
         name: 'useNuxtUIField',
