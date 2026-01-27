@@ -1,4 +1,4 @@
-import { defineNuxtModule, addComponent, addImports, addServerImports, createResolver, logger } from '@nuxt/kit'
+import { defineNuxtModule, addComponent, addComponentsDir, addImports, addServerImports, createResolver, logger } from '@nuxt/kit'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ModuleOptions {}
@@ -49,6 +49,15 @@ export default defineNuxtModule<ModuleOptions>({
         name: 'useNuxtUIField',
         from: resolver.resolve('./runtime/composables/useNuxtUIField'),
       })
+      addImports({
+        name: 'useSchemaIntrospection',
+        from: resolver.resolve('./runtime/composables/useSchemaIntrospection'),
+      })
+      const autoFormTypes = ['ResolvedField', 'FieldConfig', 'FieldConstraints', 'FieldUI']
+      autoFormTypes.forEach((name) => {
+        addImports({ name, from: resolver.resolve('./runtime/composables/useSchemaIntrospection'), type: true })
+      })
+      addComponentsDir({ path: resolver.resolve('./runtime/components'), prefix: 'F' })
     }
 
     // Auto-import methods
