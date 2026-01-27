@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, resolveComponent, h, useAppConfig } from '#imports'
+import { computed, resolveComponent, h, useAppConfig, ref, watch } from '#imports'
 import type { ResolvedField, FieldConfig } from '../composables/useSchemaIntrospection'
 import { formatLabel } from '../utils/formatLabel'
 import theme from '../theme/autoFormField'
@@ -24,12 +24,14 @@ const emit = defineEmits<{
 const USwitch = resolveComponent('USwitch')
 const USelect = resolveComponent('USelect')
 const UInput = resolveComponent('UInput')
+const UTextarea = resolveComponent('UTextarea')
 const UFormField = resolveComponent('UFormField')
 
 if (import.meta.dev) {
   if (typeof USwitch === 'string') console.warn('[formisch] USwitch not found. Install @nuxt/ui')
   if (typeof USelect === 'string') console.warn('[formisch] USelect not found. Install @nuxt/ui')
   if (typeof UInput === 'string') console.warn('[formisch] UInput not found. Install @nuxt/ui')
+  if (typeof UTextarea === 'string') console.warn('[formisch] UTextarea not found. Install @nuxt/ui')
   if (typeof UFormField === 'string') console.warn('[formisch] UFormField not found. Install @nuxt/ui')
 }
 
@@ -61,6 +63,34 @@ const slots = computed(() => {
   }
 })
 
+// JSON field state
+const isJsonField = computed(() => props.field.ui.fieldType === 'json')
+const jsonText = ref('')
+const jsonError = ref(false)
+
+watch(() => props.modelValue, (val) => {
+  if (!isJsonField.value) return
+  try {
+    jsonText.value = JSON.stringify(val, null, 2)
+    jsonError.value = false
+  }
+  catch {
+    jsonText.value = String(val ?? '')
+  }
+}, { immediate: true })
+
+function onJsonInput(text: string) {
+  jsonText.value = text
+  try {
+    const parsed = JSON.parse(text)
+    jsonError.value = false
+    emit('update:modelValue', parsed)
+  }
+  catch {
+    jsonError.value = true
+  }
+}
+
 function renderInput() {
   // Custom component override
   if (props.fieldConfig?.component) {
@@ -73,6 +103,19 @@ function renderInput() {
   }
 
   const f = props.field
+
+  // JSON field via fieldType metadata
+  if (f.ui.fieldType === 'json') {
+    const rows = Math.min(Math.max(jsonText.value.split('\n').length, 3), 15)
+    return h(UTextarea, {
+      'modelValue': jsonText.value,
+      'onUpdate:modelValue': onJsonInput,
+      'disabled': isDisabled.value,
+      'placeholder': placeholder.value || '{}',
+      'rows': rows,
+      'class': ['font-mono text-xs', jsonError.value && 'ring-2 ring-error/50'].filter(Boolean).join(' '),
+    })
+  }
 
   if (f.type === 'boolean') {
     return h(USwitch, {

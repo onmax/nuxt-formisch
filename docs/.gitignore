@@ -1,4 +1,6 @@
-.docs/
+# Ignore generated docs directory contents, but keep app.vue
+.docs/*
+!.docs/app.vue
 node_modules/
 .vercel
 .env*.local

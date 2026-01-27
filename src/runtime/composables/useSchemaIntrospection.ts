@@ -16,6 +16,7 @@ export interface FieldUI {
   section?: string
   placeholder?: string
   component?: Component
+  fieldType?: 'json'
 }
 
 export interface FieldConfig {
@@ -107,6 +108,7 @@ function extractPipeInfo(schema: SchemaLike): { constraints: FieldConstraints, u
         if (meta.section) ui.section = meta.section as string
         if (meta.placeholder) ui.placeholder = meta.placeholder as string
         if (meta.component) ui.component = meta.component as Component
+        if (meta.fieldType) ui.fieldType = meta.fieldType as 'json'
       }
     }
   }
