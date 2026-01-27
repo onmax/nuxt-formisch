@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, resolveComponent, h } from 'vue'
 import type { ResolvedField, FieldConfig } from '../composables/useSchemaIntrospection'
+import { formatLabel } from '../utils/formatLabel'
 
 const props = defineProps<{
   field: ResolvedField
@@ -30,10 +31,6 @@ const description = computed(() => props.fieldConfig?.description || props.field
 const placeholder = computed(() => props.fieldConfig?.placeholder || props.field.ui.placeholder)
 const unit = computed(() => props.fieldConfig?.unit || props.field.ui.unit)
 const isDisabled = computed(() => props.disabled || props.fieldConfig?.disabled)
-
-function formatLabel(name: string): string {
-  return name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-}
 
 function renderInput() {
   // Custom component override
@@ -100,7 +97,7 @@ function renderInput() {
   >
     <template #default>
       <div class="flex items-center gap-2">
-        <component :is="renderInput" />
+        <component :is="renderInput()" />
         <span
           v-if="unit"
           class="text-sm text-muted"

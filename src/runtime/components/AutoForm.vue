@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, provide, ref, toRaw } from 'vue'
+import { computed, reactive, ref, toRaw, watchEffect } from 'vue'
 import { useForm, useField } from '@formisch/vue'
 import type { Schema } from '@formisch/vue'
 import { useSchemaIntrospection } from '../composables/useSchemaIntrospection'
@@ -68,27 +68,26 @@ const sections = computed(() => {
   return map
 })
 
-// Collect errors from field stores
-const fieldStores = computed(() => {
-  const stores: Record<string, ReturnType<typeof useAutoField>> = {}
+// Collect field stores reactively (avoid calling composables inside computed)
+const fieldStores = reactive<Record<string, ReturnType<typeof useAutoField>>>({})
+watchEffect(() => {
   for (const f of resolvedFields.value) {
-    stores[f.name] = useAutoField(f.name)
+    if (!fieldStores[f.name]) {
+      fieldStores[f.name] = useAutoField(f.name)
+    }
   }
-  return stores
 })
 
 const flatErrors = computed(() => {
   const errors: Record<string, string> = {}
-  for (const [name, store] of Object.entries(fieldStores.value)) {
+  for (const [name, store] of Object.entries(fieldStores)) {
     if (store.errors?.[0]) errors[name] = store.errors[0]
   }
   return errors
 })
 
-provide('autoFormDisabled', computed(() => props.disabled))
-provide('autoFormFieldConfig', computed(() => props.fieldConfig))
-
-const gridClass = computed(() => `grid gap-4 grid-cols-${props.columns}`)
+const GRID_COLS: Record<number, string> = { 1: 'grid gap-4 grid-cols-1', 2: 'grid gap-4 grid-cols-2', 3: 'grid gap-4 grid-cols-3', 4: 'grid gap-4 grid-cols-4' }
+const gridClass = computed(() => GRID_COLS[props.columns] || GRID_COLS[1])
 
 function colSpanStyle(field: ResolvedField) {
   const span = props.fieldConfig?.[field.name]?.colSpan
@@ -101,7 +100,7 @@ async function handleSubmit() {
     // Validate via standard schema
     const schema = props.schema as Schema & { '~standard': { validate: (data: unknown) => Promise<{ value?: unknown, issues?: unknown[] }> } }
     const raw = Object.fromEntries(
-      Object.entries(fieldStores.value).map(([name, store]) => [name, toRaw(store.input)]),
+      Object.entries(fieldStores).map(([name, store]) => [name, toRaw(store.input)]),
     )
     const result = await schema['~standard'].validate(raw)
     if (result.issues && result.issues.length > 0) {
@@ -115,6 +114,9 @@ async function handleSubmit() {
     else {
       emit('submit', (result as { value: unknown }).value as Record<string, unknown>)
     }
+  }
+  catch (err) {
+    emit('error', { _form: err instanceof Error ? err.message : 'Validation failed' })
   }
   finally {
     isSubmitting.value = false

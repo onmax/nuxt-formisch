@@ -41,6 +41,7 @@
 
 <script setup lang="ts">
 import * as v from 'valibot'
+import { jsonToValibotSchema } from '../../../src/runtime/composables/useJsonToSchema'
 
 // --- Flat: string, number, boolean, picklist, email ---
 const flatSchema = v.object({

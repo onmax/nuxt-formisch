@@ -3,4 +3,5 @@ import MyModule from '../../../src/module'
 
 export default defineNuxtConfig({
   modules: [MyModule, '@nuxt/ui'],
+  future: { compatibilityVersion: 4 },
 })

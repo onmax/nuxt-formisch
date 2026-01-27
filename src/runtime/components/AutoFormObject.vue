@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { ResolvedField, FieldConfig } from '../composables/useSchemaIntrospection'
+import { formatLabel } from '../utils/formatLabel'
 import AutoFormField from './AutoFormField.vue'
 
 const props = defineProps<{
@@ -18,10 +19,6 @@ const emit = defineEmits<{
 
 const label = computed(() => props.fieldConfig?.[props.field.name]?.label || props.field.ui.label || formatLabel(props.field.name))
 
-function formatLabel(name: string): string {
-  return name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-}
-
 function updateChild(key: string, value: unknown) {
   emit('update:modelValue', { ...props.modelValue, [key]: value })
 }
@@ -33,10 +30,8 @@ const visibleChildren = computed(() => {
     .sort((a, b) => (props.fieldConfig?.[a.name]?.order ?? 0) - (props.fieldConfig?.[b.name]?.order ?? 0))
 })
 
-const gridClass = computed(() => {
-  const cols = props.columns || 1
-  return `grid gap-4 grid-cols-${cols}`
-})
+const GRID_COLS: Record<number, string> = { 1: 'grid gap-4 grid-cols-1', 2: 'grid gap-4 grid-cols-2', 3: 'grid gap-4 grid-cols-3', 4: 'grid gap-4 grid-cols-4' }
+const gridClass = computed(() => GRID_COLS[props.columns || 1] || GRID_COLS[1])
 </script>
 
 <template>

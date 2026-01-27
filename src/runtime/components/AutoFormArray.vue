@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, resolveComponent } from 'vue'
+import { computed, ref, resolveComponent, watch } from 'vue'
 import type { ResolvedField, FieldConfig } from '../composables/useSchemaIntrospection'
+import { formatLabel } from '../utils/formatLabel'
 import AutoFormField from './AutoFormField.vue'
 
 const props = defineProps<{
@@ -18,11 +19,18 @@ const emit = defineEmits<{
 
 const label = computed(() => props.fieldConfig?.[props.field.name]?.label || props.field.ui.label || formatLabel(props.field.name))
 
-function formatLabel(name: string): string {
-  return name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-}
-
 const items = computed(() => props.modelValue || [])
+
+// Stable IDs for v-for key (avoid index-based keys)
+const itemIds = ref<string[]>([])
+watch(() => props.modelValue, (newItems) => {
+  const newIds = [...itemIds.value]
+  while (newIds.length < (newItems?.length || 0)) {
+    newIds.push(crypto.randomUUID())
+  }
+  newIds.length = newItems?.length || 0
+  itemIds.value = newIds
+}, { immediate: true })
 const isObjectArray = computed(() => props.field.itemSchema && props.field.itemSchema.length > 1)
 
 function addItem() {
@@ -59,10 +67,8 @@ function getDefault(field?: ResolvedField): unknown {
   }
 }
 
-const gridClass = computed(() => {
-  const cols = props.columns || 1
-  return `grid gap-4 grid-cols-${cols}`
-})
+const GRID_COLS: Record<number, string> = { 1: 'grid gap-4 grid-cols-1', 2: 'grid gap-4 grid-cols-2', 3: 'grid gap-4 grid-cols-3', 4: 'grid gap-4 grid-cols-4' }
+const gridClass = computed(() => GRID_COLS[props.columns || 1] || GRID_COLS[1])
 </script>
 
 <template>
@@ -73,7 +79,7 @@ const gridClass = computed(() => {
 
     <div
       v-for="(item, index) in items"
-      :key="index"
+      :key="itemIds[index]"
       class="relative border border-default rounded-lg p-4"
     >
       <component
