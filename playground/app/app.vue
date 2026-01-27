@@ -205,15 +205,16 @@ const form = useForm({
   },
 })
 
-const nameField = useField(() => form, () => ({ path: ['name'] as const }))
-const emailField = useField(() => form, () => ({ path: ['email'] as const }))
-const roleField = useField(() => form, () => ({ path: ['role'] as const }))
-const experienceField = useField(() => form, () => ({ path: ['experience'] as const }))
-const ageField = useField(() => form, () => ({ path: ['age'] as const }))
-const startDateField = useField(() => form, () => ({ path: ['startDate'] as const }))
-const avatarField = useField(() => form, () => ({ path: ['avatar'] as const }))
-const bioField = useField(() => form, () => ({ path: ['bio'] as const }))
-const newsletterField = useField(() => form, () => ({ path: ['newsletter'] as const }))
+const { field } = useFormFields(form)
+const nameField = field('name')
+const emailField = field('email')
+const roleField = field('role')
+const experienceField = field('experience')
+const ageField = field('age')
+const startDateField = field('startDate')
+const avatarField = field('avatar')
+const bioField = field('bio')
+const newsletterField = field('newsletter')
 
 async function onSubmit(values: ProfileOutput) {
   try {

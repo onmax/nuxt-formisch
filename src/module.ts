@@ -26,15 +26,30 @@ export default defineNuxtModule<ModuleOptions>({
     const hasValibot = isPackageInstalled('valibot')
     const hasZod = isPackageInstalled('zod')
     const hasArktype = isPackageInstalled('arktype')
+    const hasNuxtUI = isPackageInstalled('@nuxt/ui')
 
     if (!hasValibot && !hasZod && !hasArktype) {
       logger.warn('Formisch requires a schema library. Install: valibot (recommended), zod, or arktype')
     }
-    // Auto-import composables
+
+    // Auto-import composables from @formisch/vue
     const composables = ['useForm', 'useField', 'useFieldArray']
     composables.forEach((name) => {
       addImports({ name, from: '@formisch/vue' })
     })
+
+    // Auto-import module composables
+    addImports({
+      name: 'useFormFields',
+      from: resolver.resolve('./runtime/composables/useFormFields'),
+    })
+
+    if (hasNuxtUI) {
+      addImports({
+        name: 'useNuxtUIField',
+        from: resolver.resolve('./runtime/composables/useNuxtUIField'),
+      })
+    }
 
     // Auto-import methods
     const methods = ['focus', 'getAllErrors', 'getErrors', 'getInput', 'handleSubmit', 'insert', 'move', 'remove', 'replace', 'reset', 'setErrors', 'setInput', 'submit', 'swap', 'validate']
