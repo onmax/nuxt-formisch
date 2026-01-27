@@ -21,7 +21,7 @@ export async function useFormValidation<T>(
   return await readValidatedBody(event, async (data) => {
     const result = await schema['~standard'].validate(data)
     if (result.issues) {
-      throw createError({ statusCode: 400, data: { issues: result.issues } })
+      throw createError({ statusCode: 400, statusMessage: 'Validation Error', message: 'Form validation failed', data: { issues: result.issues } })
     }
     return result.value
   })

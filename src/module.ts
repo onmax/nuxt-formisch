@@ -1,9 +1,13 @@
-import { defineNuxtModule, addComponent, addImports, addServerImports, createResolver, logger } from '@nuxt/kit'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
+import { defineNuxtModule, addComponent, addComponentsDir, addImports, addServerImports, createResolver, logger } from '@nuxt/kit'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ModuleOptions {}
 
-function isPackageInstalled(name: string): boolean {
+function isPackageInstalled(name: string, rootDir: string): boolean {
+  // Check node_modules directly as fallback for packages without a main export
+  if (existsSync(join(rootDir, 'node_modules', ...name.split('/')))) return true
   try {
     require.resolve(name)
     return true
@@ -22,11 +26,11 @@ export default defineNuxtModule<ModuleOptions>({
   setup(_options, _nuxt) {
     const resolver = createResolver(import.meta.url)
 
-    // Check for schema library
-    const hasValibot = isPackageInstalled('valibot')
-    const hasZod = isPackageInstalled('zod')
-    const hasArktype = isPackageInstalled('arktype')
-    const hasNuxtUI = isPackageInstalled('@nuxt/ui')
+    const rootDir = _nuxt.options.rootDir
+    const hasValibot = isPackageInstalled('valibot', rootDir)
+    const hasZod = isPackageInstalled('zod', rootDir)
+    const hasArktype = isPackageInstalled('arktype', rootDir)
+    const hasNuxtUI = isPackageInstalled('@nuxt/ui', rootDir)
 
     if (!hasValibot && !hasZod && !hasArktype) {
       logger.warn('Formisch requires a schema library. Install: valibot (recommended), zod, or arktype')
@@ -44,11 +48,27 @@ export default defineNuxtModule<ModuleOptions>({
       from: resolver.resolve('./runtime/composables/useFormFields'),
     })
 
+    if (hasValibot) {
+      addImports({
+        name: 'jsonToValibotSchema',
+        from: resolver.resolve('./runtime/composables/useJsonToSchema'),
+      })
+    }
+
     if (hasNuxtUI) {
       addImports({
         name: 'useNuxtUIField',
         from: resolver.resolve('./runtime/composables/useNuxtUIField'),
       })
+      addImports({
+        name: 'useSchemaIntrospection',
+        from: resolver.resolve('./runtime/composables/useSchemaIntrospection'),
+      })
+      const autoFormTypes = ['ResolvedField', 'FieldConfig', 'FieldConstraints', 'FieldUI']
+      autoFormTypes.forEach((name) => {
+        addImports({ name, from: resolver.resolve('./runtime/composables/useSchemaIntrospection'), type: true })
+      })
+      addComponentsDir({ path: resolver.resolve('./runtime/components'), prefix: 'F' })
     }
 
     // Auto-import methods

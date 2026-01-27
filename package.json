@@ -41,7 +41,11 @@
     "@standard-schema/spec": "^1.0.0"
   },
   "peerDependencies": {
-    "valibot": ">=1.0.0"
+    "valibot": ">=1.0.0",
+    "@nuxt/ui": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@nuxt/ui": { "optional": true }
   },
   "devDependencies": {
     "@nuxt/devtools": "catalog:dx",
