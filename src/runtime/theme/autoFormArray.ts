@@ -2,7 +2,7 @@ import { tv } from '../utils/tv'
 
 export default tv({
   slots: {
-    root: 'space-y-2',
+    root: 'col-span-full space-y-2',
     legend: 'text-sm font-medium text-muted mb-2',
     item: 'flex items-start gap-2 p-2 bg-muted/10 rounded-md',
     removeButton: 'shrink-0 mt-6', // Align with first field input
