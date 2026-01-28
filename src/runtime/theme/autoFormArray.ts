@@ -2,12 +2,12 @@ import { tv } from '../utils/tv'
 
 export default tv({
   slots: {
-    root: 'space-y-3',
+    root: 'space-y-2',
     legend: 'text-sm font-medium text-muted mb-2',
-    item: 'flex items-start gap-2 p-3 bg-muted/5 rounded-lg border border-default/50',
+    item: 'flex items-start gap-2 p-2 bg-muted/10 rounded-md',
     removeButton: 'shrink-0 mt-6', // Align with first field input
     addButton: 'mt-2',
-    grid: 'flex-1 grid gap-3',
+    grid: 'flex-1 grid gap-2',
   },
   variants: {
     columns: {

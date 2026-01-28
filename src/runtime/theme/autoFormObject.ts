@@ -2,9 +2,9 @@ import { tv } from '../utils/tv'
 
 export default tv({
   slots: {
-    root: 'border border-default rounded-lg p-4 space-y-4',
+    root: 'rounded-lg p-3 space-y-3 bg-muted/5',
     legend: 'text-sm font-medium px-2',
-    grid: 'grid gap-4',
+    grid: 'grid gap-3',
   },
   variants: {
     columns: {
