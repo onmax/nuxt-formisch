@@ -10,9 +10,9 @@ export default tv({
   variants: {
     columns: {
       1: { grid: 'grid-cols-1' },
-      2: { grid: 'grid-cols-2' },
-      3: { grid: 'grid-cols-3' },
-      4: { grid: 'grid-cols-4' },
+      2: { grid: 'sm:grid-cols-2' },
+      3: { grid: 'sm:grid-cols-2 lg:grid-cols-3' },
+      4: { grid: 'sm:grid-cols-2 lg:grid-cols-4' },
     },
   },
   defaultVariants: { columns: 1 },

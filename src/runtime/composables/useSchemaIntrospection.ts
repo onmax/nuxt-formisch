@@ -61,12 +61,22 @@ interface SchemaLike {
 function unwrapSchema(schema: SchemaLike): { inner: SchemaLike, required: boolean } {
   let required = true
   let current = schema
+
   while (current.type === 'optional' || current.type === 'nullable' || current.type === 'nullish') {
     if (!current.wrapped) break
     required = false
     current = current.wrapped
   }
   return { inner: current, required }
+}
+
+// Get the base schema type from a potentially piped schema
+function getBaseSchema(schema: SchemaLike): SchemaLike {
+  // Pipe schemas have the base type as the first element
+  if (schema.type === 'pipe' && Array.isArray(schema.pipe) && schema.pipe[0]) {
+    return schema.pipe[0] as SchemaLike
+  }
+  return schema
 }
 
 function extractPipeInfo(schema: SchemaLike): { constraints: FieldConstraints, ui: FieldUI } {
@@ -117,7 +127,8 @@ function extractPipeInfo(schema: SchemaLike): { constraints: FieldConstraints, u
 }
 
 function resolveBaseType(schema: SchemaLike): ResolvedField['type'] {
-  switch (schema.type) {
+  const base = getBaseSchema(schema)
+  switch (base.type) {
     case 'string': return 'string'
     case 'number': return 'number'
     case 'boolean': return 'boolean'
@@ -145,6 +156,12 @@ function resolveField(schema: SchemaLike, name: string, path: (string | number)[
   const type = resolveBaseType(inner)
   const field: ResolvedField = { name, path, type, required, constraints, ui }
 
+  // Record types should render as JSON fields
+  const baseSchema = getBaseSchema(inner)
+  if (baseSchema.type === 'record') {
+    field.ui.fieldType = 'json'
+  }
+
   if (type === 'picklist' || type === 'enum')
     field.options = extractOptions(inner)
 
@@ -162,7 +179,13 @@ function resolveField(schema: SchemaLike, name: string, path: (string | number)[
       )
     }
     else {
-      field.itemSchema = [resolveField(itemSchema, 'value', ['value'])]
+      // Scalar arrays: use empty name to avoid "Value" label on each item
+      const itemField = resolveField(itemSchema, '', [])
+      itemField.ui.label = '' // Clear label for scalar array items
+      if (itemSchema.type === 'unknown' || itemSchema.type === 'any') {
+        itemField.ui.fieldType = 'json'
+      }
+      field.itemSchema = [itemField]
     }
   }
 

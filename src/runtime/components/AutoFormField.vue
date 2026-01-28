@@ -63,8 +63,14 @@ const slots = computed(() => {
   }
 })
 
-// JSON field state
-const isJsonField = computed(() => props.field.ui.fieldType === 'json')
+// JSON field state - also auto-detect objects/arrays that need JSON rendering
+const isJsonField = computed(() => {
+  if (props.field.ui.fieldType === 'json') return true
+  // Auto-detect: if value is object/array and not a primitive field type, render as JSON
+  const val = props.modelValue
+  if (val !== null && typeof val === 'object') return true
+  return false
+})
 const jsonText = ref('')
 const jsonError = ref(false)
 
@@ -104,8 +110,8 @@ function renderInput() {
 
   const f = props.field
 
-  // JSON field via fieldType metadata
-  if (f.ui.fieldType === 'json') {
+  // JSON field via fieldType metadata OR auto-detected object/array
+  if (isJsonField.value) {
     const rows = Math.min(Math.max(jsonText.value.split('\n').length, 3), 15)
     return h(UTextarea, {
       'modelValue': jsonText.value,
@@ -129,7 +135,7 @@ function renderInput() {
     return h(USelect, {
       'modelValue': value.value,
       'onUpdate:modelValue': (v: unknown) => { value.value = v },
-      'placeholder': placeholder.value,
+      'placeholder': placeholder.value || 'Select...',
       'disabled': isDisabled.value,
       'items': f.options || [],
     })

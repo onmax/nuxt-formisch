@@ -49,7 +49,12 @@ watch(() => props.modelValue, (newItems) => {
   newIds.length = newItems?.length || 0
   itemIds.value = newIds
 }, { immediate: true })
-const isObjectArray = computed(() => props.field.itemSchema && props.field.itemSchema.length > 1)
+const isObjectArray = computed(() => {
+  if (!props.field.itemSchema?.length) return false
+  // Object array if first item is object type OR has multiple fields
+  const first = props.field.itemSchema[0]
+  return first.type === 'object' || props.field.itemSchema.length > 1
+})
 
 function addItem() {
   const newItem = isObjectArray.value
@@ -101,27 +106,16 @@ const slots = computed(() => {
 </script>
 
 <template>
-  <fieldset :class="slots.root">
-    <legend :class="slots.legend">
+  <div :class="slots.root">
+    <div :class="slots.legend">
       {{ label }}
-    </legend>
+    </div>
 
     <div
       v-for="(item, index) in items"
       :key="itemIds[index]"
       :class="slots.item"
     >
-      <component
-        :is="UButton"
-        variant="ghost"
-        color="error"
-        size="xs"
-        icon="i-lucide-trash-2"
-        :class="slots.removeButton"
-        :disabled="disabled"
-        @click="removeItem(index)"
-      />
-
       <!-- Object array: render fields for each property -->
       <div
         v-if="isObjectArray"
@@ -146,7 +140,19 @@ const slots = computed(() => {
         :model-value="item"
         :error="errors?.[`${field.name}.${index}`]"
         :disabled="disabled"
+        class="flex-1"
         @update:model-value="updateItem(index, $event)"
+      />
+
+      <component
+        :is="UButton"
+        variant="ghost"
+        color="error"
+        size="xs"
+        icon="i-lucide-trash-2"
+        :class="slots.removeButton"
+        :disabled="disabled"
+        @click="removeItem(index)"
       />
     </div>
 
@@ -161,5 +167,5 @@ const slots = computed(() => {
     >
       Add {{ field.ui.label || formatLabel(field.name).replace(/s$/, '') }}
     </component>
-  </fieldset>
+  </div>
 </template>
