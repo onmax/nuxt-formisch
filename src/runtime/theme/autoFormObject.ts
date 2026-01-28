@@ -2,7 +2,7 @@ import { tv } from '../utils/tv'
 
 export default tv({
   slots: {
-    root: 'col-span-full rounded-lg p-3 space-y-3 bg-muted/5',
+    root: 'col-span-full rounded-lg border border-default p-3 space-y-3 bg-muted/5',
     legend: 'text-sm font-medium px-2',
     grid: 'grid gap-3',
   },
