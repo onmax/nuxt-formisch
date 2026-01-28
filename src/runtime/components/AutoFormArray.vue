@@ -41,7 +41,7 @@ const items = computed(() => props.modelValue || [])
 
 // Stable IDs for v-for key (avoid index-based keys)
 const itemIds = ref<string[]>([])
-watch(() => props.modelValue, (newItems) => {
+watch(() => props.modelValue, (newItems: unknown[] | undefined) => {
   const newIds = [...itemIds.value]
   while (newIds.length < (newItems?.length || 0)) {
     newIds.push(generateId())
@@ -53,7 +53,7 @@ const isObjectArray = computed(() => {
   if (!props.field.itemSchema?.length) return false
   // Object array if first item is object type OR has multiple fields
   const first = props.field.itemSchema[0]
-  return first.type === 'object' || props.field.itemSchema.length > 1
+  return first?.type === 'object' || props.field.itemSchema.length > 1
 })
 
 function addItem() {
@@ -64,7 +64,7 @@ function addItem() {
 }
 
 function removeItem(index: number) {
-  emit('update:modelValue', items.value.filter((_, i) => i !== index))
+  emit('update:modelValue', items.value.filter((_: unknown, i: number) => i !== index))
 }
 
 function updateItem(index: number, value: unknown) {

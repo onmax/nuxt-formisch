@@ -149,7 +149,48 @@ describe('introspectSchema', () => {
       const fields = introspectSchema(schema)
       expect(fields[0]).toMatchObject({ name: 'tags', type: 'array' })
       expect(fields[0].itemSchema).toHaveLength(1)
-      expect(fields[0].itemSchema![0]).toMatchObject({ name: 'value', type: 'string' })
+      // Scalar arrays use empty name to avoid "Value" label on each item
+      expect(fields[0].itemSchema![0]).toMatchObject({ name: '', type: 'string' })
+    })
+
+    it('resolves array of unknown with fallback itemSchema', () => {
+      const schema = v.object({ items: v.array(v.unknown()) })
+      const fields = introspectSchema(schema)
+      expect(fields[0]).toMatchObject({ name: 'items', type: 'array' })
+      expect(fields[0].itemSchema).toHaveLength(1)
+      expect(fields[0].itemSchema![0].ui.fieldType).toBe('json')
+    })
+
+    it('resolves nested array within object array', () => {
+      const schema = v.object({
+        items: v.array(v.object({
+          label: v.string(),
+          filters: v.array(v.string()),
+        })),
+      })
+      const fields = introspectSchema(schema)
+      expect(fields[0]).toMatchObject({ name: 'items', type: 'array' })
+      expect(fields[0].itemSchema).toHaveLength(2)
+      expect(fields[0].itemSchema![1]).toMatchObject({ name: 'filters', type: 'array' })
+      expect(fields[0].itemSchema![1].itemSchema).toHaveLength(1)
+      expect(fields[0].itemSchema![1].itemSchema![0]).toMatchObject({ type: 'string' })
+    })
+  })
+
+  describe('record schemas', () => {
+    it('marks record schema as JSON field', () => {
+      const schema = v.object({ mappings: v.record(v.string(), v.string()) })
+      const fields = introspectSchema(schema)
+      expect(fields[0]).toMatchObject({ name: 'mappings', type: 'string' })
+      expect(fields[0].ui.fieldType).toBe('json')
+    })
+
+    it('marks piped record schema as JSON field', () => {
+      const schema = v.object({ mappings: v.pipe(v.record(v.string(), v.string()), v.title('Mappings')) })
+      const fields = introspectSchema(schema)
+      expect(fields[0]).toMatchObject({ name: 'mappings', type: 'string' })
+      expect(fields[0].ui.fieldType).toBe('json')
+      expect(fields[0].ui.label).toBe('Mappings')
     })
   })
 

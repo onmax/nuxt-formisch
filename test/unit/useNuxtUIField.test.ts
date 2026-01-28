@@ -46,7 +46,7 @@ describe('useNuxtUIField', () => {
 
   it('reflects first error when present', async () => {
     const schema = v.object({ name: v.pipe(v.string(), v.minLength(2)) })
-    const form = useForm({ schema, initialInput: { name: '' }, mode: 'onChange' })
+    const form = useForm({ schema, initialInput: { name: '' }, validate: 'change' })
     const field = useField(() => form, () => ({ path: ['name'] as const }))
     const { error } = useNuxtUIField(field)
 
@@ -60,7 +60,7 @@ describe('useNuxtUIField', () => {
 
   it('clears error when validation passes', async () => {
     const schema = v.object({ name: v.pipe(v.string(), v.minLength(2)) })
-    const form = useForm({ schema, initialInput: { name: '' }, mode: 'onChange' })
+    const form = useForm({ schema, initialInput: { name: '' }, validate: 'change' })
     const field = useField(() => form, () => ({ path: ['name'] as const }))
     const { error } = useNuxtUIField(field)
 

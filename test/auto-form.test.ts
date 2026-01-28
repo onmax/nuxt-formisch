@@ -104,4 +104,24 @@ describe('auto-form', async () => {
       expect(html).toContain('Tags')
     })
   })
+
+  describe('nested array within object array', () => {
+    it('renders section', () => {
+      expect(html).toContain('Nested Array')
+    })
+
+    it('renders parent array', () => {
+      expect(html).toContain('Suggestions')
+    })
+
+    it('renders nested array field as form array', () => {
+      expect(html).toContain('Filters')
+      // Should render add button for nested array (not a JSON textarea)
+      expect(html).toContain('Add Filter')
+    })
+
+    it('renders object fields within array', () => {
+      expect(html).toContain('Suggestion Label')
+    })
+  })
 })

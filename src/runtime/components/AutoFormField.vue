@@ -3,6 +3,7 @@ import { computed, resolveComponent, h, useAppConfig, ref, watch } from '#import
 import type { ResolvedField, FieldConfig } from '../composables/useSchemaIntrospection'
 import { formatLabel } from '../utils/formatLabel'
 import theme from '../theme/autoFormField'
+import AutoFormArray from './AutoFormArray.vue'
 
 type SlotKeys = 'root' | 'wrapper' | 'unit'
 
@@ -37,7 +38,7 @@ if (import.meta.dev) {
 
 const value = computed({
   get: () => props.modelValue,
-  set: v => emit('update:modelValue', v),
+  set: (v: unknown) => emit('update:modelValue', v),
 })
 
 const inputType = computed(() => {
@@ -66,6 +67,8 @@ const slots = computed(() => {
 // JSON field state - also auto-detect objects/arrays that need JSON rendering
 const isJsonField = computed(() => {
   if (props.field.ui.fieldType === 'json') return true
+  // Arrays with itemSchema render via AutoFormArray, not JSON
+  if (props.field.type === 'array' && props.field.itemSchema) return false
   // Auto-detect: if value is object/array and not a primitive field type, render as JSON
   const val = props.modelValue
   if (val !== null && typeof val === 'object') return true
@@ -74,7 +77,7 @@ const isJsonField = computed(() => {
 const jsonText = ref('')
 const jsonError = ref(false)
 
-watch(() => props.modelValue, (val) => {
+watch(() => props.modelValue, (val: unknown) => {
   if (!isJsonField.value) return
   try {
     jsonText.value = JSON.stringify(val, null, 2)
@@ -109,6 +112,17 @@ function renderInput() {
   }
 
   const f = props.field
+
+  // Nested array - render recursively via AutoFormArray
+  if (f.type === 'array' && f.itemSchema) {
+    return h(AutoFormArray, {
+      'field': f,
+      'modelValue': (value.value as unknown[]) || [],
+      'onUpdate:modelValue': (v: unknown) => { value.value = v },
+      'errors': props.error ? { [f.name]: props.error } : {},
+      'disabled': isDisabled.value,
+    })
+  }
 
   // JSON field via fieldType metadata OR auto-detected object/array
   if (isJsonField.value) {

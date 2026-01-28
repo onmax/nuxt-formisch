@@ -63,7 +63,11 @@ provide('navigation', navigation)
     <AppFooter />
 
     <ClientOnly>
-      <LazyUContentSearch :files="files" :navigation="navigation" shortcut="meta_k" />
+      <LazyUContentSearch
+        :files="files"
+        :navigation="navigation"
+        shortcut="meta_k"
+      />
     </ClientOnly>
   </UApp>
 </template>

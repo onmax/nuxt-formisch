@@ -198,7 +198,7 @@ const experienceOptions = ['junior', 'mid', 'senior', 'lead']
 
 const form = useForm({
   schema: profileSchema,
-  initialValues: {
+  initialInput: {
     name: 'John Doe',
     email: 'john@example.com',
     role: 'developer' as const,

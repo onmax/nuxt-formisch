@@ -48,10 +48,10 @@ export interface ResolvedField {
 interface SchemaLike {
   kind?: string
   type?: string
-  pipe?: SchemaLike[]
+  pipe?: readonly SchemaLike[]
   entries?: Record<string, SchemaLike>
   item?: SchemaLike
-  options?: unknown[]
+  options?: readonly unknown[]
   enum?: Record<string, unknown>
   wrapped?: SchemaLike
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

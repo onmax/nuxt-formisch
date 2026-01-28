@@ -38,10 +38,18 @@ const form = useForm({
 const initialFields = introspectSchema(props.schema as any)
 
 // Create field stores for all schema fields at setup time (composables must be called at top level)
+// Skip JSON fields as they use unsupported schema types (record, unknown) that @formisch/vue can't handle
 const fieldStores: Record<string, ReturnType<typeof useField>> = {}
+const jsonFieldRefs: Record<string, ReturnType<typeof ref>> = {}
 for (const f of initialFields) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fieldStores[f.name] = (useField as any)(() => form, () => ({ path: [f.name] as const }))
+  if (f.ui.fieldType === 'json') {
+    // JSON fields bypass the form store - use simple refs instead
+    jsonFieldRefs[f.name] = ref(props.initialValues?.[f.name])
+  }
+  else {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    fieldStores[f.name] = (useField as any)(() => form, () => ({ path: [f.name] as const }))
+  }
 }
 
 // Resolved fields with fieldConfig applied (re-computed when fieldConfig changes)
@@ -62,8 +70,8 @@ function reset() {
 // Visible + sorted fields
 const visibleFields = computed(() =>
   resolvedFields.value
-    .filter(f => !props.fieldConfig?.[f.name]?.hidden)
-    .sort((a, b) => (props.fieldConfig?.[a.name]?.order ?? 0) - (props.fieldConfig?.[b.name]?.order ?? 0)),
+    .filter((f: ResolvedField) => !props.fieldConfig?.[f.name]?.hidden)
+    .sort((a: ResolvedField, b: ResolvedField) => (props.fieldConfig?.[a.name]?.order ?? 0) - (props.fieldConfig?.[b.name]?.order ?? 0)),
 )
 
 // Group by section
@@ -84,6 +92,16 @@ const flatErrors = computed(() => {
   }
   return errors
 })
+
+// Unified field value getters/setters for both regular and JSON fields
+function getFieldValue(name: string) {
+  if (jsonFieldRefs[name]) return jsonFieldRefs[name].value
+  return fieldStores[name]?.input
+}
+function setFieldValue(name: string, value: unknown) {
+  if (jsonFieldRefs[name]) jsonFieldRefs[name].value = value
+  else if (fieldStores[name]) fieldStores[name].input = value
+}
 
 const appConfig = useAppConfig()
 const slots = computed(() => {
@@ -107,9 +125,10 @@ async function handleSubmit() {
   try {
     // Validate via standard schema
     const schema = props.schema as Schema & { '~standard': { validate: (data: unknown) => Promise<{ value?: unknown, issues?: unknown[] }> } }
-    const raw = Object.fromEntries(
-      Object.entries(fieldStores).map(([name, store]) => [name, toRaw(store.input)]),
-    )
+    const raw = {
+      ...Object.fromEntries(Object.entries(fieldStores).map(([name, store]) => [name, toRaw(store.input)])),
+      ...Object.fromEntries(Object.entries(jsonFieldRefs).map(([name, r]) => [name, toRaw(r.value)])),
+    }
     const result = await schema['~standard'].validate(raw)
     if (result.issues && result.issues.length > 0) {
       const errors: Record<string, string> = {}
@@ -164,38 +183,38 @@ async function handleSubmit() {
                   <AutoFormObject
                     v-if="field.type === 'object' && field.children"
                     :field="field"
-                    :model-value="(fieldStores[field.name]?.input as Record<string, unknown>) || {}"
+                    :model-value="(getFieldValue(field.name) as Record<string, unknown>) || {}"
                     :errors="flatErrors"
                     :disabled="disabled"
                     :field-config="fieldConfig"
                     :columns="columns"
                     :style="colSpanStyle(field)"
-                    @update:model-value="fieldStores[field.name].input = $event"
+                    @update:model-value="setFieldValue(field.name, $event)"
                   />
 
                   <!-- Array -->
                   <AutoFormArray
                     v-else-if="field.type === 'array' && field.itemSchema"
                     :field="field"
-                    :model-value="(fieldStores[field.name]?.input as unknown[]) || []"
+                    :model-value="(getFieldValue(field.name) as unknown[]) || []"
                     :errors="flatErrors"
                     :disabled="disabled"
                     :field-config="fieldConfig"
                     :columns="columns"
                     :style="colSpanStyle(field)"
-                    @update:model-value="fieldStores[field.name].input = $event"
+                    @update:model-value="setFieldValue(field.name, $event)"
                   />
 
                   <!-- Leaf field -->
                   <AutoFormField
                     v-else
                     :field="field"
-                    :model-value="fieldStores[field.name]?.input"
+                    :model-value="getFieldValue(field.name)"
                     :error="flatErrors[field.name]"
                     :disabled="disabled"
                     :field-config="fieldConfig?.[field.name]"
                     :style="colSpanStyle(field)"
-                    @update:model-value="fieldStores[field.name].input = $event"
+                    @update:model-value="setFieldValue(field.name, $event)"
                   />
                 </slot>
               </template>

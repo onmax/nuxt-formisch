@@ -14,11 +14,10 @@ function humanize(key: string): string {
 }
 
 function inferStringSchema(value: string, key?: string): v.GenericSchema {
-  const title = key ? v.title(humanize(key)) : null
-  if (EMAIL_REGEX.test(value)) return title ? v.pipe(v.string(), v.email(), title) : v.pipe(v.string(), v.email())
-  if (URL_REGEX.test(value)) return title ? v.pipe(v.string(), v.url(), title) : v.pipe(v.string(), v.url())
-  if (ISO_DATE_REGEX.test(value)) return title ? v.pipe(v.string(), v.isoDate(), title) : v.pipe(v.string(), v.isoDate())
-  return title ? v.pipe(v.string(), title) : v.string()
+  if (EMAIL_REGEX.test(value)) return key ? v.pipe(v.string(), v.email(), v.title(humanize(key))) : v.pipe(v.string(), v.email())
+  if (URL_REGEX.test(value)) return key ? v.pipe(v.string(), v.url(), v.title(humanize(key))) : v.pipe(v.string(), v.url())
+  if (ISO_DATE_REGEX.test(value)) return key ? v.pipe(v.string(), v.isoDate(), v.title(humanize(key))) : v.pipe(v.string(), v.isoDate())
+  return key ? v.pipe(v.string(), v.title(humanize(key))) : v.string()
 }
 
 function getCommonType(items: unknown[]): 'string' | 'number' | 'boolean' | 'object' | 'mixed' {
