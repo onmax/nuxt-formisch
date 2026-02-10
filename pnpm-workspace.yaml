@@ -12,7 +12,7 @@ catalogs:
     vue-tsc: ^3.2.4
   dx:
     '@nuxt/devtools': ^3.1.1
-    changelogen: ^0.6.2
+    bumpp: ^10.1.0
   frontend:
     '@formisch/vue': ^0.6.5
     nuxt: ^4.2.0
