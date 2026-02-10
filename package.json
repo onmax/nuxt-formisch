@@ -2,7 +2,11 @@
   "name": "nuxt-formisch",
   "version": "0.0.4",
   "description": "Formisch integration for Nuxt - schema-based, headless form library",
-  "repository": { "type": "git", "url": "git+https://github.com/formisch/nuxt.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onmax/nuxt-formisch.git"
+  },
+  "homepage": "https://nuxt-formisch.onmax.me",
   "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@10.19.0",
@@ -36,16 +40,20 @@
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
   "dependencies": {
-    "@formisch/vue": "catalog:frontend",
-    "@nuxt/kit": "catalog:backend",
-    "@standard-schema/spec": "^1.0.0"
+    "@formisch/vue": "^0.6.5",
+    "@nuxt/kit": "^4.2.0",
+    "@standard-schema/spec": "^1.1.0",
+    "scule": "^1.3.0",
+    "tailwind-variants": "^3.2.2"
   },
   "peerDependencies": {
-    "valibot": ">=1.0.0",
-    "@nuxt/ui": ">=3.0.0"
+    "@nuxt/ui": ">=3.0.0",
+    "valibot": ">=1.0.0"
   },
   "peerDependenciesMeta": {
-    "@nuxt/ui": { "optional": true }
+    "@nuxt/ui": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@nuxt/devtools": "catalog:dx",

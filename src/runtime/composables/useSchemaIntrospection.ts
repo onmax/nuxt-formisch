@@ -16,6 +16,7 @@ export interface FieldUI {
   section?: string
   placeholder?: string
   component?: Component
+  fieldType?: 'json'
 }
 
 export interface FieldConfig {
@@ -47,10 +48,10 @@ export interface ResolvedField {
 interface SchemaLike {
   kind?: string
   type?: string
-  pipe?: SchemaLike[]
+  pipe?: readonly SchemaLike[]
   entries?: Record<string, SchemaLike>
   item?: SchemaLike
-  options?: unknown[]
+  options?: readonly unknown[]
   enum?: Record<string, unknown>
   wrapped?: SchemaLike
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,11 +61,22 @@ interface SchemaLike {
 function unwrapSchema(schema: SchemaLike): { inner: SchemaLike, required: boolean } {
   let required = true
   let current = schema
+
   while (current.type === 'optional' || current.type === 'nullable' || current.type === 'nullish') {
+    if (!current.wrapped) break
     required = false
-    current = current.wrapped!
+    current = current.wrapped
   }
   return { inner: current, required }
+}
+
+// Get the base schema type from a potentially piped schema
+function getBaseSchema(schema: SchemaLike): SchemaLike {
+  // Pipe schemas have the base type as the first element
+  if (schema.type === 'pipe' && Array.isArray(schema.pipe) && schema.pipe[0]) {
+    return schema.pipe[0] as SchemaLike
+  }
+  return schema
 }
 
 function extractPipeInfo(schema: SchemaLike): { constraints: FieldConstraints, ui: FieldUI } {
@@ -106,6 +118,7 @@ function extractPipeInfo(schema: SchemaLike): { constraints: FieldConstraints, u
         if (meta.section) ui.section = meta.section as string
         if (meta.placeholder) ui.placeholder = meta.placeholder as string
         if (meta.component) ui.component = meta.component as Component
+        if (meta.fieldType) ui.fieldType = meta.fieldType as 'json'
       }
     }
   }
@@ -114,7 +127,8 @@ function extractPipeInfo(schema: SchemaLike): { constraints: FieldConstraints, u
 }
 
 function resolveBaseType(schema: SchemaLike): ResolvedField['type'] {
-  switch (schema.type) {
+  const base = getBaseSchema(schema)
+  switch (base.type) {
     case 'string': return 'string'
     case 'number': return 'number'
     case 'boolean': return 'boolean'
@@ -142,6 +156,12 @@ function resolveField(schema: SchemaLike, name: string, path: (string | number)[
   const type = resolveBaseType(inner)
   const field: ResolvedField = { name, path, type, required, constraints, ui }
 
+  // Record types should render as JSON fields
+  const baseSchema = getBaseSchema(inner)
+  if (baseSchema.type === 'record') {
+    field.ui.fieldType = 'json'
+  }
+
   if (type === 'picklist' || type === 'enum')
     field.options = extractOptions(inner)
 
@@ -159,7 +179,13 @@ function resolveField(schema: SchemaLike, name: string, path: (string | number)[
       )
     }
     else {
-      field.itemSchema = [resolveField(itemSchema, 'value', ['value'])]
+      // Scalar arrays: use empty name to avoid "Value" label on each item
+      const itemField = resolveField(itemSchema, '', [])
+      itemField.ui.label = '' // Clear label for scalar array items
+      if (itemSchema.type === 'unknown' || itemSchema.type === 'any') {
+        itemField.ui.fieldType = 'json'
+      }
+      field.itemSchema = [itemField]
     }
   }
 
@@ -186,9 +212,9 @@ function applyFieldConfig(fields: ResolvedField[], config?: Record<string, Field
   })
 }
 
-export function useSchemaIntrospection(schema: SchemaLike, fieldConfig?: Record<string, FieldConfig>): ResolvedField[] {
+export function introspectSchema(schema: SchemaLike, fieldConfig?: Record<string, FieldConfig>): ResolvedField[] {
   if (schema.type !== 'object' || !schema.entries)
-    throw new Error('useSchemaIntrospection expects a valibot object schema')
+    throw new Error('introspectSchema expects a valibot object schema')
 
   // Unwrap pipe if present (v.pipe(v.object({...}), ...))
   const entries = schema.entries as Record<string, SchemaLike>

@@ -36,6 +36,15 @@
         :initial-values="rawJson"
       />
     </section>
+
+    <!-- Test 5: Nested array within object array -->
+    <section id="nested-array">
+      <h2>Nested Array</h2>
+      <FAutoForm
+        :schema="nestedArraySchema"
+        :initial-values="nestedArrayValues"
+      />
+    </section>
   </div>
 </template>
 
@@ -81,4 +90,14 @@ const arrayValues = { team_name: 'Alpha', members: [{ name: 'Alice', role: 'lead
 // --- Inferred from raw JSON ---
 const rawJson = { count: 42, label: 'test', enabled: true, tags: ['a', 'b'], nested: { x: 1, y: 2 } }
 const inferredSchema = jsonToValibotSchema(rawJson)
+
+// --- Nested array within object array ---
+const nestedArraySchema = v.object({
+  suggestions: v.pipe(v.array(v.object({
+    label: v.pipe(v.string(), v.title('Suggestion Label')),
+    filters: v.pipe(v.array(v.string()), v.title('Filters')),
+  })), v.title('Suggestions')),
+})
+
+const nestedArrayValues = { suggestions: [{ label: 'First', filters: ['a', 'b'] }] }
 </script>

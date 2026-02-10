@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { computed } from '#imports'
 import type { FieldStore, Schema, RequiredPath } from '@formisch/vue'
 
 export function useNuxtUIField<TSchema extends Schema, TPath extends RequiredPath>(field: FieldStore<TSchema, TPath>) {

@@ -7,20 +7,20 @@ catalogs:
     '@nuxt/schema': ^4.2.0
   build:
     '@nuxt/module-builder': ^1.0.2
-    '@types/node': latest
+    '@types/node': ^25.0.10
     typescript: ~5.9.3
-    vue-tsc: ^3.1.2
+    vue-tsc: ^3.2.4
   dx:
-    '@nuxt/devtools': ^2.7.0
+    '@nuxt/devtools': ^3.1.1
     changelogen: ^0.6.2
   frontend:
-    '@formisch/vue': ^0.4.0
+    '@formisch/vue': ^0.6.5
     nuxt: ^4.2.0
   inlined:
-    valibot: ^1.1.0
+    valibot: ^1.2.0
   lint:
-    '@nuxt/eslint-config': ^1.9.0
-    eslint: ^9.38.0
+    '@nuxt/eslint-config': ^1.13.0
+    eslint: ^9.39.2
   test:
     '@nuxt/test-utils': ^3.20.1
     '@playwright/test': ^1.56.1

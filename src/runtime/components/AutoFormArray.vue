@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, resolveComponent, watch } from 'vue'
+import { computed, ref, resolveComponent, watch, useAppConfig, useId } from '#imports'
 import type { ResolvedField, FieldConfig } from '../composables/useSchemaIntrospection'
 import { formatLabel } from '../utils/formatLabel'
+import theme from '../theme/autoFormArray'
 import AutoFormField from './AutoFormField.vue'
+
+type SlotKeys = 'root' | 'legend' | 'item' | 'removeButton' | 'addButton' | 'grid'
 
 const props = defineProps<{
   field: ResolvedField
@@ -10,12 +13,27 @@ const props = defineProps<{
   errors?: Record<string, string>
   disabled?: boolean
   fieldConfig?: Record<string, FieldConfig>
-  columns?: number
+  columns?: 1 | 2 | 3 | 4
+  class?: string
+  ui?: Partial<Record<SlotKeys, string>>
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: unknown[]]
 }>()
+
+// Resolve UButton once at setup time
+const UButton = resolveComponent('UButton')
+if (import.meta.dev && typeof UButton === 'string') {
+  console.warn('[formisch] UButton not found. Install @nuxt/ui')
+}
+
+// SSR-safe ID generation
+const baseId = useId()
+let idCounter = 0
+function generateId() {
+  return `${baseId}-${idCounter++}`
+}
 
 const label = computed(() => props.fieldConfig?.[props.field.name]?.label || props.field.ui.label || formatLabel(props.field.name))
 
@@ -23,15 +41,20 @@ const items = computed(() => props.modelValue || [])
 
 // Stable IDs for v-for key (avoid index-based keys)
 const itemIds = ref<string[]>([])
-watch(() => props.modelValue, (newItems) => {
+watch(() => props.modelValue, (newItems: unknown[] | undefined) => {
   const newIds = [...itemIds.value]
   while (newIds.length < (newItems?.length || 0)) {
-    newIds.push(crypto.randomUUID())
+    newIds.push(generateId())
   }
   newIds.length = newItems?.length || 0
   itemIds.value = newIds
 }, { immediate: true })
-const isObjectArray = computed(() => props.field.itemSchema && props.field.itemSchema.length > 1)
+const isObjectArray = computed(() => {
+  if (!props.field.itemSchema?.length) return false
+  // Object array if first item is object type OR has multiple fields
+  const first = props.field.itemSchema[0]
+  return first?.type === 'object' || props.field.itemSchema.length > 1
+})
 
 function addItem() {
   const newItem = isObjectArray.value
@@ -41,7 +64,7 @@ function addItem() {
 }
 
 function removeItem(index: number) {
-  emit('update:modelValue', items.value.filter((_, i) => i !== index))
+  emit('update:modelValue', items.value.filter((_: unknown, i: number) => i !== index))
 }
 
 function updateItem(index: number, value: unknown) {
@@ -67,36 +90,36 @@ function getDefault(field?: ResolvedField): unknown {
   }
 }
 
-const GRID_COLS: Record<number, string> = { 1: 'grid gap-4 grid-cols-1', 2: 'grid gap-4 grid-cols-2', 3: 'grid gap-4 grid-cols-3', 4: 'grid gap-4 grid-cols-4' }
-const gridClass = computed(() => GRID_COLS[props.columns || 1] || GRID_COLS[1])
+const appConfig = useAppConfig()
+const slots = computed(() => {
+  const tv = theme({ columns: props.columns || 1 })
+  const appUi = (appConfig.ui as { autoFormArray?: Partial<Record<SlotKeys, string>> } | undefined)?.autoFormArray
+  return {
+    root: [tv.root(), appUi?.root, props.ui?.root, props.class].filter(Boolean).join(' '),
+    legend: [tv.legend(), appUi?.legend, props.ui?.legend].filter(Boolean).join(' '),
+    item: [tv.item(), appUi?.item, props.ui?.item].filter(Boolean).join(' '),
+    removeButton: [tv.removeButton(), appUi?.removeButton, props.ui?.removeButton].filter(Boolean).join(' '),
+    addButton: [tv.addButton(), appUi?.addButton, props.ui?.addButton].filter(Boolean).join(' '),
+    grid: [tv.grid(), appUi?.grid, props.ui?.grid].filter(Boolean).join(' '),
+  }
+})
 </script>
 
 <template>
-  <fieldset class="border border-default rounded-lg p-4 space-y-4">
-    <legend class="text-sm font-medium px-2">
+  <div :class="slots.root">
+    <div :class="slots.legend">
       {{ label }}
-    </legend>
+    </div>
 
     <div
       v-for="(item, index) in items"
       :key="itemIds[index]"
-      class="relative border border-default rounded-lg p-4"
+      :class="slots.item"
     >
-      <component
-        :is="resolveComponent('UButton')"
-        variant="ghost"
-        color="error"
-        size="xs"
-        icon="i-lucide-trash-2"
-        class="absolute top-2 right-2"
-        :disabled="disabled"
-        @click="removeItem(index)"
-      />
-
       <!-- Object array: render fields for each property -->
       <div
         v-if="isObjectArray"
-        :class="gridClass"
+        :class="slots.grid"
       >
         <AutoFormField
           v-for="childField in field.itemSchema"
@@ -117,19 +140,32 @@ const gridClass = computed(() => GRID_COLS[props.columns || 1] || GRID_COLS[1])
         :model-value="item"
         :error="errors?.[`${field.name}.${index}`]"
         :disabled="disabled"
+        class="flex-1"
         @update:model-value="updateItem(index, $event)"
+      />
+
+      <component
+        :is="UButton"
+        variant="ghost"
+        color="error"
+        size="xs"
+        icon="i-lucide-trash-2"
+        :class="slots.removeButton"
+        :disabled="disabled"
+        @click="removeItem(index)"
       />
     </div>
 
     <component
-      :is="resolveComponent('UButton')"
+      :is="UButton"
       variant="outline"
       size="sm"
       icon="i-lucide-plus"
+      :class="slots.addButton"
       :disabled="disabled"
       @click="addItem"
     >
       Add {{ field.ui.label || formatLabel(field.name).replace(/s$/, '') }}
     </component>
-  </fieldset>
+  </div>
 </template>

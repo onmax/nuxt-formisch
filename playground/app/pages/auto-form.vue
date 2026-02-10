@@ -141,6 +141,38 @@
         </FAutoForm>
       </UCard>
 
+      <!-- JSON field schema -->
+      <UCard>
+        <template #header>
+          <h2 class="text-xl font-semibold">
+            JSON Field Demo
+          </h2>
+        </template>
+        <FAutoForm
+          :schema="jsonConfigSchema"
+          :initial-values="jsonConfigValues"
+          @submit="onSubmit('jsonConfig', $event)"
+        >
+          <template #actions="{ isDirty, reset }">
+            <div class="flex gap-2 pt-4">
+              <UButton
+                variant="outline"
+                :disabled="!isDirty"
+                @click="reset"
+              >
+                Reset
+              </UButton>
+              <UButton
+                type="submit"
+                :disabled="!isDirty"
+              >
+                Save
+              </UButton>
+            </div>
+          </template>
+        </FAutoForm>
+      </UCard>
+
       <!-- Result output -->
       <UAlert
         v-if="lastSubmit"
@@ -205,6 +237,15 @@ const teamSchema = v.object({
 })
 
 const teamValues = { team_name: 'Engineering', members: [{ name: 'Alice', role: 'lead' as const }, { name: 'Bob', role: 'developer' as const }] }
+
+// --- JSON field ---
+const jsonConfigSchema = v.object({
+  name: v.pipe(v.string(), v.minLength(1), v.title('Config Name')),
+  mappings: v.pipe(v.record(v.string(), v.string()), v.title('Mappings'), v.description('Key-value mappings as JSON'), v.metadata({ fieldType: 'json' })),
+  settings: v.pipe(v.unknown(), v.title('Custom Settings'), v.metadata({ fieldType: 'json' })),
+})
+
+const jsonConfigValues = { name: 'PLC Mappings', mappings: { active: 'ACTIVE', discontinued: 'DISCONTINUED' }, settings: { enabled: true, threshold: 100 } }
 
 // --- Submit handlers ---
 const lastSubmit = ref<Record<string, unknown>>()
