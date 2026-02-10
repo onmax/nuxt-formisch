@@ -22,12 +22,12 @@ catalogs:
     '@nuxt/eslint-config': ^1.13.0
     eslint: ^9.39.2
   test:
-    '@nuxt/test-utils': ^3.20.1
+    '@nuxt/test-utils': ^4.0.0
     '@playwright/test': ^1.56.1
     '@vue/test-utils': ^2.4.6
-    happy-dom: ^20.0.8
+    happy-dom: ^20.0.11
     playwright-core: ^1.56.1
-    vitest: ^3.2.4
+    vitest: ^4.0.18
   ui:
     '@nuxt/ui': ^4.0.0
 
