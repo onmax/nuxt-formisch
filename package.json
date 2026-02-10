@@ -1,6 +1,6 @@
 {
   "name": "nuxt-formisch",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Formisch integration for Nuxt - schema-based, headless form library",
   "repository": {
     "type": "git",
