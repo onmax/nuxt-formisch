@@ -69,7 +69,7 @@ export default defineNuxtModule<ModuleOptions>({
       })
       const autoFormTypes = ['ResolvedField', 'FieldConfig', 'FieldConstraints', 'FieldUI']
       autoFormTypes.forEach((name) => {
-        addImports({ name, from: resolver.resolve('./runtime/composables/useSchemaIntrospection'), type: true })
+        addImports({ name, from: resolver.resolve('./runtime/composables/useSchemaIntrospection'), type: true, priority: -1 })
       })
       addComponentsDir({ path: resolver.resolve('./runtime/components'), prefix: 'F' })
     }
@@ -83,7 +83,7 @@ export default defineNuxtModule<ModuleOptions>({
     // Auto-import types
     const types = ['SubmitHandler', 'FormConfig', 'Schema', 'FieldElement', 'DeepPartial', 'PartialValues', 'PathValue', 'RequiredPath', 'ValidArrayPath', 'ValidationMode', 'ValidPath']
     types.forEach((name) => {
-      addImports({ name, from: '@formisch/vue', type: true })
+      addImports({ name, from: '@formisch/vue', type: true, priority: -1 })
     })
 
     // Auto-import components with F prefix
