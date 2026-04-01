@@ -77,7 +77,7 @@ export default defineNuxtModule<ModuleOptions>({
     // Auto-import methods
     const methods = ['focus', 'getAllErrors', 'getErrors', 'getInput', 'handleSubmit', 'insert', 'move', 'remove', 'replace', 'reset', 'setErrors', 'setInput', 'submit', 'swap', 'validate']
     methods.forEach((name) => {
-      addImports({ name, from: '@formisch/vue' })
+      addImports({ name, from: resolver.resolve('./runtime/composables/formMethods') })
     })
 
     // Auto-import types
