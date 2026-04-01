@@ -80,15 +80,7 @@ export function move(form: AnyForm, config: MoveConfig) {
 }
 
 export function remove(form: AnyForm, config: RemoveConfig) {
-  const nextInput = readArrayInput(form, config.path)
-  if (!nextInput)
-    return rawRemove(form, config)
-
-  if (config.at < 0 || config.at >= nextInput.length)
-    return
-
-  nextInput.splice(config.at, 1)
-  rawSetInput(form, { path: config.path, input: nextInput })
+  return rawRemove(form, config)
 }
 
 export function replace(form: AnyForm, config: ReplaceConfig) {
