@@ -1,0 +1,21 @@
+diff --git a/dist/index.js b/dist/index.js
+index 5ceda21a547a835aea899ad242ae077c67fe8bad..4ae4d592c2a1d4f4b9b800ca336445e8f8757ba4 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -603,7 +603,15 @@ function insert(form, config) {
+ 		const newItems = [...items];
+ 		newItems.splice(insertIndex, 0, createId());
+ 		internalArrayStore.items.value = newItems;
+-		for (let index = items.length; index > insertIndex; index--) copyItemState(internalArrayStore.children[index - 1], internalArrayStore.children[index]);
++		for (let index = items.length; index > insertIndex; index--) {
++			if (!internalArrayStore.children[index]) {
++				const path = JSON.parse(internalArrayStore.name);
++				internalArrayStore.children[index] = {};
++				path.push(index);
++				initializeFieldStore(internalArrayStore.children[index], internalArrayStore.schema.item, void 0, path);
++			}
++			copyItemState(internalArrayStore.children[index - 1], internalArrayStore.children[index]);
++		}
+ 		if (!internalArrayStore.children[insertIndex]) {
+ 			const path = JSON.parse(internalArrayStore.name);
+ 			internalArrayStore.children[insertIndex] = {};

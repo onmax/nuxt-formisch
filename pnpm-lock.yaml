@@ -68,13 +68,18 @@ catalogs:
       specifier: ^4.0.0
       version: 4.1.0
 
+patchedDependencies:
+  '@formisch/vue':
+    hash: 5b3579f1e67b1f43b6915d0ed147c5ef6ef2cd40694453771bbf5d6f5a971ece
+    path: patches/@formisch__vue.patch
+
 importers:
 
   .:
     dependencies:
       '@formisch/vue':
         specifier: ^0.6.5
-        version: 0.6.5(typescript@5.9.3)(valibot@1.2.0(typescript@5.9.3))(vue@3.5.27(typescript@5.9.3))
+        version: 0.6.5(patch_hash=5b3579f1e67b1f43b6915d0ed147c5ef6ef2cd40694453771bbf5d6f5a971ece)(typescript@5.9.3)(valibot@1.2.0(typescript@5.9.3))(vue@3.5.27(typescript@5.9.3))
       '@nuxt/kit':
         specifier: ^4.2.0
         version: 4.3.0(magicast@0.5.1)
@@ -6127,7 +6132,7 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
-  '@formisch/vue@0.6.5(typescript@5.9.3)(valibot@1.2.0(typescript@5.9.3))(vue@3.5.27(typescript@5.9.3))':
+  '@formisch/vue@0.6.5(patch_hash=5b3579f1e67b1f43b6915d0ed147c5ef6ef2cd40694453771bbf5d6f5a971ece)(typescript@5.9.3)(valibot@1.2.0(typescript@5.9.3))(vue@3.5.27(typescript@5.9.3))':
     dependencies:
       valibot: 1.2.0(typescript@5.9.3)
       vue: 3.5.27(typescript@5.9.3)
