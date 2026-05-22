@@ -9,7 +9,7 @@
   "homepage": "https://nuxt-formisch.onmax.me",
   "license": "MIT",
   "type": "module",
-  "packageManager": "pnpm@10.19.0",
+  "packageManager": "pnpm@11.2.2",
   "exports": {
     ".": {
       "types": "./dist/types.d.mts",
@@ -64,10 +64,14 @@
     "@types/node": "catalog:build",
     "bumpp": "catalog:dx",
     "eslint": "catalog:lint",
+    "h3": "catalog:backend",
     "nuxt": "catalog:frontend",
+    "playwright": "catalog:test",
     "typescript": "catalog:build",
     "valibot": "catalog:inlined",
     "vitest": "catalog:test",
-    "vue-tsc": "catalog:build"
+    "vue": "catalog:frontend",
+    "vue-tsc": "catalog:build",
+    "tailwindcss": "catalog:ui"
   }
 }

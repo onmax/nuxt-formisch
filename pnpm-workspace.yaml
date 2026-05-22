@@ -1,10 +1,17 @@
 packages:
   - playground
 
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  unrs-resolver: true
+  vue-demi: true
+
 catalogs:
   backend:
     '@nuxt/kit': ^4.2.0
     '@nuxt/schema': ^4.2.0
+    h3: ^1.15.5
   build:
     '@nuxt/module-builder': ^1.0.2
     '@types/node': ^25.0.10
@@ -16,6 +23,7 @@ catalogs:
   frontend:
     '@formisch/vue': ^0.6.5
     nuxt: ^4.2.0
+    vue: ^3.5.27
   inlined:
     valibot: ^1.2.0
   lint:
@@ -26,10 +34,12 @@ catalogs:
     '@playwright/test': ^1.56.1
     '@vue/test-utils': ^2.4.6
     happy-dom: ^20.0.11
+    playwright: ^1.56.1
     playwright-core: ^1.56.1
     vitest: ^4.0.18
   ui:
     '@nuxt/ui': ^4.0.0
+    tailwindcss: ^4.1.18
 
 onlyBuiltDependencies:
   - '@parcel/watcher'
