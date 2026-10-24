@@ -31,16 +31,23 @@ export default defineNuxtConfig({
 })
 ```
 
-```vue
-<!-- app/pages/login.vue -->
-<script setup lang="ts">
+Define the schema in `shared/utils/`, where both the app and the server auto-import it:
+
+```ts
+// shared/utils/schemas.ts
 import * as v from 'valibot'
 
-const LoginSchema = v.object({
+export const LoginSchema = v.object({
   email: v.pipe(v.string(), v.email()),
   password: v.pipe(v.string(), v.minLength(8)),
 })
+```
 
+Build the form. `useForm`, `<FForm>` and `<FField>` are auto-imported:
+
+```vue
+<!-- app/pages/login.vue -->
+<script setup lang="ts">
 const form = useForm({ schema: LoginSchema })
 
 const login: SubmitHandler<typeof LoginSchema> = values =>
@@ -62,29 +69,49 @@ const login: SubmitHandler<typeof LoginSchema> = values =>
 </template>
 ```
 
-With Nuxt UI installed, `<FAutoForm>` renders the inputs, labels and errors from the schema:
+Validate the same body on the server. `readValidatedFormBody` returns the typed output or throws a 400 with the issues:
+
+```ts
+// server/api/login.post.ts
+export default defineEventHandler(async (event) => {
+  const { email } = await readValidatedFormBody(event, LoginSchema)
+  return { email }
+})
+```
+
+With [Nuxt UI](https://ui.nuxt.com) in `modules`, `<FAutoForm>` renders the inputs, labels, errors and submit button from the schema:
 
 ```vue
-<FAutoForm :schema="LoginSchema" @submit="login">
-  <template #actions="{ isSubmitting }">
-    <UButton type="submit" :loading="isSubmitting">Log in</UButton>
-  </template>
-</FAutoForm>
+<FAutoForm :schema="LoginSchema" @submit="login" />
 ```
 
 ## Docs
 
-[nuxt-formisch.onmax.me](https://nuxt-formisch.onmax.me): [getting started](https://nuxt-formisch.onmax.me/getting-started), [composables](https://nuxt-formisch.onmax.me/forms/composables), [methods](https://nuxt-formisch.onmax.me/forms/methods), [server validation](https://nuxt-formisch.onmax.me/forms/server-validation), [AutoForm](https://nuxt-formisch.onmax.me/auto-form).
+- [Getting started](https://nuxt-formisch.onmax.me/getting-started): install, first form, configuration
+- [Forms](https://nuxt-formisch.onmax.me/forms/composables): composables, methods, components, server validation
+- [AutoForm](https://nuxt-formisch.onmax.me/auto-form): usage, customization, theming
+- [Migrating from 0.0.x](https://nuxt-formisch.onmax.me/getting-started/migration)
 
 ## Develop
 
 ```bash
 pnpm install
-pnpm dev                          # the playground in playground/
+pnpm dev:prepare    # stub the module and prepare the playground
+pnpm dev            # the playground in playground/
 pnpm test
-pnpm --dir docs install
-pnpm --dir docs dev               # the docs site in docs/
-pnpm --dir docs og                # redraw docs/public/og/*.png
+pnpm lint
+pnpm typecheck
+pnpm check:doctor   # vite-doctor
+pnpm validate       # build the module and run publint
+```
+
+The docs site in `docs/` is a separate project with its own lockfile:
+
+```bash
+cd docs
+pnpm install
+pnpm dev
+pnpm og             # redraw docs/public/og/*.png
 ```
 
 ## Release
