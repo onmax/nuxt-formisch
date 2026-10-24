@@ -5,6 +5,7 @@ export default defineAppConfig({
   assistant: { enabled: false, explainWithAi: false },
   header: {
     title: 'Nuxt Formisch',
+    logo: { favicon: '/favicon.svg' },
   },
   github: {
     url: 'https://github.com/onmax/nuxt-formisch',

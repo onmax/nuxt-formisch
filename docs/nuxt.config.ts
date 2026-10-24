@@ -22,7 +22,6 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
       meta: [
         { property: 'og:image', content: ogImage },
         { property: 'og:image:width', content: '1200' },

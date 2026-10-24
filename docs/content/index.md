@@ -28,16 +28,19 @@ Type-safe forms for Nuxt
 <script setup lang="ts">
 import * as v from 'valibot'
 
-const form = useForm({
-  schema: v.object({
-    email: v.pipe(v.string(), v.email()),
-    password: v.pipe(v.string(), v.minLength(8)),
-  }),
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
 })
+
+const form = useForm({ schema: LoginSchema })
+
+const login: SubmitHandler<typeof LoginSchema> = values =>
+  $fetch('/api/login', { method: 'POST', body: values })
 </script>
 
 <template>
-  <FForm :of="form" @submit="values => $fetch('/api/login', { method: 'POST', body: values })">
+  <FForm :of="form" @submit="login">
     <FField v-slot="field" :of="form" :path="['email']">
       <input v-model="field.input" v-bind="field.props" type="email">
       <p v-if="field.errors">{{ field.errors[0] }}</p>
