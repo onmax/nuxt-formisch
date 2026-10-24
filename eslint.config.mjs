@@ -1,27 +1,15 @@
 // @ts-check
 import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 
-// Run `npx @eslint/config-inspector` to inspect the resolved config interactively
+// Inspect the resolved config with `pnpm dlx @eslint/config-inspector`
 export default createConfigForNuxt({
   features: {
-    // Rules for module authors
     tooling: true,
-    // Rules for formatting
     stylistic: true,
   },
   dirs: {
-    src: [
-      './playground',
-    ],
+    src: ['./playground'],
   },
 }).prepend({
-  ignores: [
-    '.nuxt',
-    '.output',
-    'dist',
-    'node_modules',
-    'playground/.nuxt',
-    'playground/.output',
-    'playground/dist',
-  ],
+  ignores: ['docs', '.vercel', '**/.nuxt', '**/.output', 'dist'],
 })

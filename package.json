@@ -1,15 +1,30 @@
 {
   "name": "nuxt-formisch",
+  "type": "module",
   "version": "0.0.8",
-  "description": "Formisch integration for Nuxt - schema-based, headless form library",
+  "packageManager": "pnpm@12.15.0",
+  "description": "Formisch integration for Nuxt: schema-based, headless forms with Valibot and an optional Nuxt UI AutoForm",
+  "author": "onmax",
+  "license": "MIT",
+  "homepage": "https://nuxt-formisch.onmax.me",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/onmax/nuxt-formisch.git"
   },
-  "homepage": "https://nuxt-formisch.onmax.me",
-  "license": "MIT",
-  "type": "module",
-  "packageManager": "pnpm@11.2.2",
+  "bugs": {
+    "url": "https://github.com/onmax/nuxt-formisch/issues"
+  },
+  "keywords": [
+    "nuxt",
+    "nuxt-module",
+    "formisch",
+    "forms",
+    "valibot",
+    "standard-schema",
+    "nuxt-ui",
+    "vue"
+  ],
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/types.d.mts",
@@ -17,61 +32,59 @@
     }
   },
   "main": "./dist/module.mjs",
-  "typesVersions": {
-    "*": {
-      ".": [
-        "./dist/types.d.mts"
-      ]
-    }
-  },
+  "types": "./dist/types.d.mts",
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
-    "prepack": "nuxt-module-build build",
-    "dev": "npm run dev:prepare && nuxi dev playground",
-    "dev:build": "nuxi build playground",
+    "build": "nuxt-module-build prepare && nuxt-module-build build",
+    "prepack": "pnpm build",
+    "dev": "nuxi dev playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
-    "release": "bumpp && git push --follow-tags",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "typecheck": "vue-tsc --noEmit && vue-tsc --noEmit -p playground",
     "test": "vitest run",
-    "test:watch": "vitest watch",
-    "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
-  },
-  "dependencies": {
-    "@formisch/vue": "^0.6.5",
-    "@nuxt/kit": "^4.2.0",
-    "@standard-schema/spec": "^1.1.0",
-    "scule": "^1.3.0",
-    "tailwind-variants": "^3.2.2"
+    "check:doctor": "vite-doctor . --max-warnings 0 --format text",
+    "validate": "pnpm build && publint --strict"
   },
   "peerDependencies": {
-    "@nuxt/ui": ">=3.0.0",
-    "valibot": ">=1.0.0"
+    "@nuxt/ui": ">=4.0.0",
+    "nuxt": ">=4.0.0",
+    "valibot": "^1.4.1"
   },
   "peerDependenciesMeta": {
     "@nuxt/ui": {
       "optional": true
     }
   },
+  "dependencies": {
+    "@formisch/vue": "catalog:prod",
+    "@nuxt/kit": "catalog:prod",
+    "@standard-schema/spec": "catalog:prod",
+    "scule": "catalog:prod",
+    "tailwind-variants": "catalog:prod"
+  },
   "devDependencies": {
-    "@nuxt/devtools": "catalog:dx",
     "@nuxt/eslint-config": "catalog:lint",
     "@nuxt/module-builder": "catalog:build",
-    "@nuxt/schema": "catalog:backend",
     "@nuxt/test-utils": "catalog:test",
+    "@nuxt/ui": "catalog:nuxt",
     "@types/node": "catalog:build",
-    "bumpp": "catalog:dx",
     "eslint": "catalog:lint",
-    "h3": "catalog:backend",
-    "nuxt": "catalog:frontend",
-    "playwright": "catalog:test",
+    "h3": "catalog:nuxt",
+    "nuxt": "catalog:nuxt",
+    "playwright-core": "catalog:test",
+    "publint": "catalog:build",
+    "tailwindcss": "catalog:nuxt",
     "typescript": "catalog:build",
-    "valibot": "catalog:inlined",
+    "valibot": "catalog:nuxt",
+    "vite-doctor": "catalog:lint",
     "vitest": "catalog:test",
-    "vue": "catalog:frontend",
-    "vue-tsc": "catalog:build",
-    "tailwindcss": "catalog:ui"
+    "vue": "catalog:nuxt",
+    "vue-tsc": "catalog:build"
   }
 }
