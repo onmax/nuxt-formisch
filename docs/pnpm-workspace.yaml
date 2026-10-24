@@ -1,6 +1,8 @@
-packages: []
-ignoredBuiltDependencies:
-  - "@parcel/watcher"
-  - "@tailwindcss/oxide"
-  - esbuild
-  - vue-demi
+# Standalone workspace: the docs keep their own lockfile, apart from the module's.
+allowBuilds:
+  '@parcel/watcher': true
+  better-sqlite3: true
+  esbuild: true
+  sharp: true
+  unrs-resolver: false
+  vue-demi: false

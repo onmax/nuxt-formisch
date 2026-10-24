@@ -1,18 +1,21 @@
 {
-  "private": true,
+  "name": "nuxt-formisch-docs",
   "type": "module",
+  "private": true,
+  "packageManager": "pnpm@11.28.5",
   "scripts": {
-    "build": "undocs build",
-    "dev": "undocs dev"
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "og": "node scripts/og.ts"
+  },
+  "dependencies": {
+    "docus": "^5.15.0",
+    "nuxt": "^4.6.2"
   },
   "devDependencies": {
-    "nuxt": "4.1.2",
-    "undocs": "0.4.10"
-  },
-  "pnpm": {
-    "overrides": {
-      "nuxi": "3.28.0"
-    }
-  },
-  "packageManager": "pnpm@10.19.0"
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "playwright-core": "^1.64.1"
+  }
 }

@@ -1,5 +1,6 @@
 {
-  "buildCommand": "pnpm build",
-  "outputDirectory": ".docs/.output/public",
-  "installCommand": "pnpm install"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nuxtjs",
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm build"
 }

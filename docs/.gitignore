@@ -1,6 +1,6 @@
-# Ignore generated docs directory contents, but keep app.vue
-.docs/*
-!.docs/app.vue
-node_modules/
+node_modules
+.nuxt
+.output
+.data
 .vercel
 .env*.local
