@@ -1,9 +1,9 @@
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
+import { $fetch, createPage, fetch, setup } from '@nuxt/test-utils/e2e'
 
 describe('module without Nuxt UI', async () => {
-  await setup({ rootDir: fileURLToPath(new URL('./fixtures/basic', import.meta.url)) })
+  await setup({ rootDir: fileURLToPath(new URL('./fixtures/basic', import.meta.url)), browser: true })
 
   it('auto-imports Formisch composables, methods and components', async () => {
     const html = await $fetch<string>('/')
@@ -34,4 +34,39 @@ describe('module without Nuxt UI', async () => {
       { message: 'Must be 18 or older', path: ['age'] },
     ])
   })
+
+  // Regression for #7, against Formisch's native insert/remove.
+  it('duplicates, edits, removes and submits object-array rows', async () => {
+    const page = await createPage('/array-regression')
+    const pageErrors: string[] = []
+    page.on('pageerror', error => pageErrors.push(error.message))
+    const rows = page.locator('[data-testid^="run-"]')
+
+    await page.getByTestId('name-0').waitFor({ timeout: 10_000 })
+    expect(await rows.count()).toBe(2)
+
+    await page.getByTestId('duplicate-0').click()
+    await page.getByTestId('name-2').waitFor({ timeout: 5_000 })
+    expect(await rows.count()).toBe(3)
+    expect(await page.getByTestId('name-1').inputValue()).toBe('Run 1')
+
+    await page.getByTestId('name-1').fill('Run 1 Copy')
+    await page.getByTestId('window-size-1').fill('9')
+    // Editing the copy must not leak into the original row.
+    expect(await page.getByTestId('name-0').inputValue()).toBe('Run 1')
+
+    await page.getByTestId('delete-2').click()
+    await expect.poll(() => rows.count()).toBe(2)
+
+    await page.getByTestId('submit').click()
+    await expect.poll(() => page.getByTestId('output').textContent()).not.toBe('')
+    expect(JSON.parse(await page.getByTestId('output').textContent() ?? '')).toEqual({
+      runs: [
+        { name: 'Run 1', config: { windowSize: 1 } },
+        { name: 'Run 1 Copy', config: { windowSize: 9 } },
+      ],
+    })
+    expect(pageErrors).toEqual([])
+    await page.close()
+  }, 30_000)
 })
