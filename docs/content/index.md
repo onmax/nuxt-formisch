@@ -58,11 +58,11 @@ const login: SubmitHandler<typeof LoginSchema> = values =>
     ::::
 
     ::::u-page-feature{icon="i-lucide-shield-check" title="One schema, both sides" to="/forms/server-validation"}
-    Validate request bodies in server routes with `useFormValidation` and the schema your form uses.
+    Validate request bodies in server routes with `readValidatedFormBody` and the schema your form uses.
     ::::
 
     ::::u-page-feature{icon="i-lucide-layout-template" title="AutoForm for Nuxt UI" to="/auto-form"}
-    Pass a Valibot schema to `FAutoForm` and get inputs, labels, errors, nested objects and arrays.
+    Pass a Valibot schema to `<FAutoForm>` and get typed output, inputs, labels, errors, nested objects and arrays.
     ::::
   :::
 ::
