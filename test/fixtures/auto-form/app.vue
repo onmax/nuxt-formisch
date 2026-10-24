@@ -1,103 +1,79 @@
-<template>
-  <div>
-    <!-- Test 1: Flat schema with all leaf types -->
-    <section id="flat">
-      <h2>Flat Schema</h2>
-      <FAutoForm
-        :schema="flatSchema"
-        :initial-values="flatValues"
-        :columns="2"
-      />
-    </section>
-
-    <!-- Test 2: Nested object -->
-    <section id="nested">
-      <h2>Nested Object</h2>
-      <FAutoForm
-        :schema="nestedSchema"
-        :initial-values="nestedValues"
-      />
-    </section>
-
-    <!-- Test 3: Array of objects -->
-    <section id="array">
-      <h2>Array Schema</h2>
-      <FAutoForm
-        :schema="arraySchema"
-        :initial-values="arrayValues"
-      />
-    </section>
-
-    <!-- Test 4: jsonToValibotSchema inferred -->
-    <section id="inferred">
-      <h2>Inferred Schema</h2>
-      <FAutoForm
-        :schema="inferredSchema"
-        :initial-values="rawJson"
-      />
-    </section>
-
-    <!-- Test 5: Nested array within object array -->
-    <section id="nested-array">
-      <h2>Nested Array</h2>
-      <FAutoForm
-        :schema="nestedArraySchema"
-        :initial-values="nestedArrayValues"
-      />
-    </section>
-  </div>
-</template>
-
 <script setup lang="ts">
 import * as v from 'valibot'
-import { jsonToValibotSchema } from '../../../src/runtime/composables/useJsonToSchema'
 
-// --- Flat: string, number, boolean, picklist, email ---
 const flatSchema = v.object({
   username: v.pipe(v.string(), v.minLength(2), v.title('Username')),
   email: v.pipe(v.string(), v.email(), v.title('Email Address')),
-  age: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(120), v.title('Age'), v.metadata({ unit: 'years' })),
-  role: v.pipe(v.picklist(['admin', 'editor', 'viewer']), v.title('Role')),
-  active: v.pipe(v.boolean(), v.title('Active')),
-  bio: v.pipe(v.optional(v.string()), v.title('Bio')),
+  age: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(120), v.metadata({ unit: 'years' })),
+  role: v.picklist(['admin', 'editor', 'viewer']),
+  active: v.boolean(),
+  bio: v.pipe(v.optional(v.string()), v.title('Biography')),
+  secret: v.pipe(v.string(), v.metadata({ hidden: true })),
 })
 
-const flatValues = { username: 'john', email: 'john@test.com', age: 30, role: 'editor' as const, active: true, bio: 'Hello' }
-
-// --- Nested object ---
 const nestedSchema = v.object({
-  name: v.pipe(v.string(), v.title('Name')),
   address: v.object({
-    street: v.pipe(v.string(), v.title('Street')),
-    city: v.pipe(v.string(), v.title('City')),
+    street: v.string(),
     zip: v.pipe(v.string(), v.title('ZIP Code')),
   }),
-})
-
-const nestedValues = { name: 'Jane', address: { street: '123 Main St', city: 'Copenhagen', zip: '1000' } }
-
-// --- Array of objects ---
-const arraySchema = v.object({
-  team_name: v.pipe(v.string(), v.title('Team Name')),
+  mappings: v.record(v.string(), v.string()),
   members: v.array(v.object({
     name: v.pipe(v.string(), v.title('Member Name')),
-    role: v.pipe(v.picklist(['lead', 'dev', 'design']), v.title('Member Role')),
+    filters: v.pipe(v.array(v.string()), v.title('Filters')),
   })),
 })
 
-const arrayValues = { team_name: 'Alpha', members: [{ name: 'Alice', role: 'lead' as const }, { name: 'Bob', role: 'dev' as const }] }
+// Dotted slot names need the dynamic slot syntax in templates.
+const memberSlot = 'field:members.name'
 
-// --- Inferred from raw JSON ---
-const rawJson = { count: 42, label: 'test', enabled: true, tags: ['a', 'b'], nested: { x: 1, y: 2 } }
-const inferredSchema = jsonToValibotSchema(rawJson)
-
-// --- Nested array within object array ---
-const nestedArraySchema = v.object({
-  suggestions: v.pipe(v.array(v.object({
-    label: v.pipe(v.string(), v.title('Suggestion Label')),
-    filters: v.pipe(v.array(v.string()), v.title('Filters')),
-  })), v.title('Suggestions')),
+const submitSchema = v.object({
+  name: v.pipe(v.string(), v.minLength(2, 'Too short')),
+  tags: v.array(v.string()),
+  settings: v.record(v.string(), v.number()),
 })
+const submitted = ref<v.InferOutput<typeof submitSchema>>()
 
-const nestedArrayValues = { suggestions: [{ label: 'First', filters: ['a', 'b'] }] }
+const inferred = { count: 42, label: 'test', tags: ['a', 'b'] }
+const inferredSchema = jsonToValibotSchema(inferred)
 </script>
+
+<template>
+  <div>
+    <FAutoForm
+      :schema="flatSchema"
+      :initial-input="{ username: 'ada', email: 'ada@example.com', age: 36, role: 'editor', active: true, secret: 'x' }"
+      :columns="2"
+      :field-config="{ username: { description: 'Shown publicly' } }"
+      :ui="{ grid: 'prop-grid' }"
+    />
+
+    <FAutoForm
+      :schema="nestedSchema"
+      :initial-input="{ address: { street: 'Main St', zip: '1000' }, mappings: { a: 'A' }, members: [{ name: 'Alice', filters: ['x'] }] }"
+      :field-config="{ 'address.street': { label: 'Street Name' } }"
+    >
+      <template #[memberSlot]="{ path }">
+        <span class="custom-member-slot">{{ path.join('.') }}</span>
+      </template>
+      <template #actions>
+        <button type="submit">
+          Save nested
+        </button>
+      </template>
+    </FAutoForm>
+
+    <FAutoForm
+      :schema="inferredSchema"
+      :initial-input="inferred"
+    />
+
+    <section id="submit">
+      <FAutoForm
+        :schema="submitSchema"
+        :initial-input="{ name: 'Ada', tags: [], settings: { retries: 1 } }"
+        @submit="output => submitted = output"
+      />
+      <pre id="submitted">{{ submitted }}</pre>
+    </section>
+  </div>
+</template>

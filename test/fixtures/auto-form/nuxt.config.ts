@@ -1,7 +1,6 @@
 import { defineNuxtConfig } from 'nuxt/config'
-import MyModule from '../../../src/module'
+import formisch from '../../../src/module'
 
 export default defineNuxtConfig({
-  modules: [MyModule, '@nuxt/ui'],
-  future: { compatibilityVersion: 4 },
+  modules: [formisch, '@nuxt/ui'],
 })
