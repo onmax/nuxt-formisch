@@ -36,6 +36,3 @@ onlyBuiltDependencies:
   - esbuild
   - unrs-resolver
   - vue-demi
-
-patchedDependencies:
-  '@formisch/vue': patches/@formisch__vue.patch
