@@ -1,7 +1,7 @@
 import { computed } from '#imports'
-import type { FieldStore, Schema, RequiredPath } from '@formisch/vue'
+import type { FieldStore, FormSchema, RequiredPath } from '@formisch/vue'
 
-export function useNuxtUIField<TSchema extends Schema, TPath extends RequiredPath>(field: FieldStore<TSchema, TPath>) {
+export function useNuxtUIField<TSchema extends FormSchema, TPath extends RequiredPath>(field: FieldStore<TSchema, TPath>) {
   return {
     modelValue: computed({
       get: () => field.input,

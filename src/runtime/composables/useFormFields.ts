@@ -1,4 +1,4 @@
-import type { FormStore, Schema } from '@formisch/vue'
+import type { FormSchema, FormStore } from '@formisch/vue'
 import { useField } from '#imports'
 
 type FieldElementProps = { ref: (el: unknown) => void, name: string, onBlur: () => void }
@@ -14,7 +14,7 @@ interface FieldResult<TValue = any> {
   readonly props: FieldElementProps
 }
 
-export function useFormFields<TSchema extends Schema>(form: FormStore<TSchema>) {
+export function useFormFields<TSchema extends FormSchema>(form: FormStore<TSchema>) {
   return {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     field: <K extends string>(key: K): FieldResult<any> => {
