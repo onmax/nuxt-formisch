@@ -65,8 +65,7 @@
     "@formisch/vue": "catalog:prod",
     "@nuxt/kit": "catalog:prod",
     "@standard-schema/spec": "catalog:prod",
-    "scule": "catalog:prod",
-    "tailwind-variants": "catalog:prod"
+    "scule": "catalog:prod"
   },
   "devDependencies": {
     "@nuxt/eslint-config": "catalog:lint",
