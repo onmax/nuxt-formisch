@@ -23,9 +23,9 @@ const form = useForm({
 const submittedOutput = ref('')
 
 function duplicateRun(index: number) {
-  const run = getInput(form, { path: ['runs', index] })
+  const run = getInput(form, { path: ['runs', index] as const })
   insert(form, {
-    path: ['runs'],
+    path: ['runs'] as never,
     at: index + 1,
     initialInput: structuredClone(run),
   })
@@ -33,7 +33,7 @@ function duplicateRun(index: number) {
 
 function removeRun(index: number) {
   remove(form, {
-    path: ['runs'],
+    path: ['runs'] as never,
     at: index,
   })
 }
