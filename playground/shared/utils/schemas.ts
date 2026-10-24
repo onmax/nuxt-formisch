@@ -1,21 +1,10 @@
 import * as v from 'valibot'
 
-/**
- * Shared schemas - usable in both client and server
- * Place in utils/ folder for auto-import in Nuxt
- */
-
+/** Shared by the client form and the server route. */
 export const profileSchema = v.object({
-  name: v.pipe(v.string(), v.minLength(2, 'Name must be at least 2 characters')),
-  email: v.pipe(v.string(), v.email('Invalid email address')),
-  role: v.picklist(['developer', 'designer', 'manager', 'other'], 'Please select a role'),
-  experience: v.picklist(['junior', 'mid', 'senior', 'lead'], 'Please select experience level'),
-  age: v.pipe(v.number(), v.minValue(18, 'Must be 18 or older'), v.maxValue(120, 'Invalid age')),
-  startDate: v.pipe(v.string(), v.minLength(1, 'Start date is required')),
-  avatar: v.optional(v.pipe(v.string(), v.url('Must be a valid URL'))),
-  bio: v.pipe(v.string(), v.minLength(10, 'Bio must be at least 10 characters')),
+  name: v.pipe(v.string(), v.minLength(2, 'Use at least 2 characters')),
+  email: v.pipe(v.string(), v.email('Enter a valid email')),
+  role: v.picklist(['developer', 'designer', 'manager'], 'Pick a role'),
+  age: v.pipe(v.number('Enter a number'), v.minValue(18, 'You must be 18 or older')),
   newsletter: v.boolean(),
 })
-
-export type ProfileInput = v.InferInput<typeof profileSchema>
-export type ProfileOutput = v.InferOutput<typeof profileSchema>

@@ -1,234 +1,157 @@
-<script setup lang="ts">
-import { computed, ref, toRaw, useForm, useField, useAppConfig } from '#imports'
-import type { Schema } from '@formisch/vue'
-import { introspectSchema } from '../composables/useSchemaIntrospection'
-import type { FieldConfig, ResolvedField } from '../composables/useSchemaIntrospection'
-import theme from '../theme/autoForm'
+<script setup lang="ts" generic="TSchema extends FormSchema">
+import { computed, provide } from 'vue'
+import type { HTMLAttributes, VNodeChild } from 'vue'
+import type * as v from 'valibot'
+import { Form, reset, useForm } from '@formisch/vue'
+import type { DeepPartial, FormSchema, FormStore, SubmitEventHandler, ValidationMode } from '@formisch/vue'
+import { tv } from '@nuxt/ui/utils/tv'
+import UButton from '@nuxt/ui/components/Button.vue'
+import { useAppConfig } from '#imports'
+import { autoFormSlots, autoFormTheme } from '../theme'
+import type { AutoFormColumns, AutoFormSlot, AutoFormThemeConfig } from '../theme'
+import { introspectSchema, toFormSchema } from '../utils/introspectSchema'
+import type { FieldConfig, ResolvedField } from '../utils/introspectSchema'
+import { autoFormKey, colSpan } from '../utils/autoForm'
+import type { FieldPath } from '../utils/autoForm'
 import AutoFormField from './AutoFormField.vue'
-import AutoFormObject from './AutoFormObject.vue'
-import AutoFormArray from './AutoFormArray.vue'
 
-type SlotKeys = 'root' | 'section' | 'sectionTitle' | 'grid'
-
-const props = withDefaults(defineProps<{
-  schema: Schema
-  initialValues?: Record<string, unknown>
+const {
+  schema,
+  initialInput,
+  fieldConfig,
+  columns,
+  disabled = false,
+  validate,
+  revalidate,
+  onSubmit,
+  class: rootClass,
+  ui: uiProp,
+} = defineProps<{
+  /** Valibot object schema. The form store is created once, so change `key` to swap schemas. */
+  schema: TSchema
+  initialInput?: DeepPartial<v.InferInput<TSchema>>
+  /** Per-field UI overrides keyed by dotted key (array indexes left out), e.g. `{ 'address.city': { label: 'Town' } }`. */
   fieldConfig?: Record<string, FieldConfig>
+  /** Grid columns for top-level fields and array items. @default 1 */
+  columns?: AutoFormColumns
   disabled?: boolean
-  columns?: 1 | 2 | 3 | 4
-  validateOn?: 'blur' | 'input' | 'change'
-  class?: string
-  ui?: Partial<Record<SlotKeys, string>>
-}>(), { columns: 1, validateOn: 'blur' })
-
-const emit = defineEmits<{
-  submit: [data: Record<string, unknown>]
-  error: [errors: Record<string, string>]
+  /** When fields validate before the first submit. @default 'submit' */
+  validate?: ValidationMode
+  /** When fields revalidate after the first submit. @default 'input' */
+  revalidate?: Exclude<ValidationMode, 'initial'>
+  /** Called with the typed, validated output. While its promise is pending, `form.isSubmitting` is true. */
+  onSubmit?: SubmitEventHandler<TSchema>
+  class?: HTMLAttributes['class']
+  /** Extra classes per theme slot. */
+  ui?: Partial<Record<AutoFormSlot, string>>
 }>()
 
-// Create formisch form store
+const slots = defineSlots<{
+  /** Replaces the default submit button. */
+  actions?: (props: { form: FormStore<TSchema>, reset: () => void }) => VNodeChild
+  /** Replaces the field with this dotted key, e.g. `field:address.city`. */
+  [key: `field:${string}`]: (props: { field: ResolvedField, path: FieldPath, form: FormStore<TSchema> }) => VNodeChild
+}>()
+
 const form = useForm({
-  schema: props.schema,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  initialInput: props.initialValues as any,
+  schema: toFormSchema(schema),
+  initialInput,
+  validate,
+  revalidate,
 })
 
-// Introspect schema once at setup time to get all field names
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const initialFields = introspectSchema(props.schema as any)
+const fields = computed(() => introspectSchema(schema, fieldConfig))
 
-// Create field stores for all schema fields at setup time (composables must be called at top level)
-// Skip JSON fields as they use unsupported schema types (record, unknown) that @formisch/vue can't handle
-const fieldStores: Record<string, ReturnType<typeof useField>> = {}
-const jsonFieldRefs: Record<string, ReturnType<typeof ref>> = {}
-for (const f of initialFields) {
-  if (f.ui.fieldType === 'json') {
-    // JSON fields bypass the form store - use simple refs instead
-    jsonFieldRefs[f.name] = ref(props.initialValues?.[f.name])
-  }
-  else {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    fieldStores[f.name] = (useField as any)(() => form, () => ({ path: [f.name] as const }))
-  }
-}
-
-// Resolved fields with fieldConfig applied (re-computed when fieldConfig changes)
-const resolvedFields = computed(() =>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  introspectSchema(props.schema as any, props.fieldConfig),
-)
-
-// Dirty tracking
-const isDirty = computed(() => form.isDirty)
-const isSubmitting = ref(false)
-
-function reset() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(form as any).reset?.()
-}
-
-// Visible + sorted fields
-const visibleFields = computed(() =>
-  resolvedFields.value
-    .filter((f: ResolvedField) => !props.fieldConfig?.[f.name]?.hidden)
-    .sort((a: ResolvedField, b: ResolvedField) => (props.fieldConfig?.[a.name]?.order ?? 0) - (props.fieldConfig?.[b.name]?.order ?? 0)),
-)
-
-// Group by section
 const sections = computed(() => {
   const map = new Map<string, ResolvedField[]>()
-  for (const field of visibleFields.value) {
-    const section = props.fieldConfig?.[field.name]?.section || field.ui.section || ''
-    if (!map.has(section)) map.set(section, [])
-    map.get(section)!.push(field)
+  for (const field of fields.value) {
+    const title = field.section ?? ''
+    map.set(title, [...(map.get(title) ?? []), field])
   }
-  return map
+  return [...map].map(([title, fields]) => ({ title, fields }))
 })
 
-const flatErrors = computed(() => {
-  const errors: Record<string, string> = {}
-  for (const [name, store] of Object.entries(fieldStores)) {
-    if (store.errors?.[0]) errors[name] = store.errors[0]
-  }
-  return errors
+// SAFETY: `appConfig.formisch` is typed by the module's `nuxt/schema` augmentation; this cast only matters
+// where Nuxt generates no app config schema, which turns the augmented key into `unknown`.
+const appConfig = useAppConfig() as { formisch?: { autoForm?: AutoFormThemeConfig } }
+const theme = tv(autoFormTheme)
+const ui = computed(() => {
+  const slotClasses = tv({ extend: theme, slots: appConfig.formisch?.autoForm?.slots ?? {} })({ columns })
+  // SAFETY: the entries cover every key of `autoFormSlots`, which is every AutoFormSlot.
+  return Object.fromEntries(autoFormSlots.map(slot => [
+    slot,
+    slotClasses[slot]({ class: [uiProp?.[slot], slot === 'root' ? rootClass : undefined] }),
+  ])) as Record<AutoFormSlot, string>
 })
 
-// Unified field value getters/setters for both regular and JSON fields
-function getFieldValue(name: string) {
-  if (jsonFieldRefs[name]) return jsonFieldRefs[name].value
-  return fieldStores[name]?.input
-}
-function setFieldValue(name: string, value: unknown) {
-  if (jsonFieldRefs[name]) jsonFieldRefs[name].value = value
-  else if (fieldStores[name]) fieldStores[name].input = value
-}
-
-const appConfig = useAppConfig()
-const slots = computed(() => {
-  const tv = theme({ columns: props.columns })
-  const appUi = (appConfig.ui as { autoForm?: Partial<Record<SlotKeys, string>> } | undefined)?.autoForm
-  return {
-    root: [tv.root(), appUi?.root, props.ui?.root, props.class].filter(Boolean).join(' '),
-    section: [tv.section(), appUi?.section, props.ui?.section].filter(Boolean).join(' '),
-    sectionTitle: [tv.sectionTitle(), appUi?.sectionTitle, props.ui?.sectionTitle].filter(Boolean).join(' '),
-    grid: [tv.grid(), appUi?.grid, props.ui?.grid].filter(Boolean).join(' '),
-  }
+provide(autoFormKey, {
+  form,
+  disabled: computed(() => disabled),
+  ui,
+  hasFieldSlot: key => Boolean(slots[`field:${key}`]),
+  renderFieldSlot: (field, path) => slots[`field:${field.key}`]?.({ field, path, form }),
 })
 
-function colSpanStyle(field: ResolvedField) {
-  const span = props.fieldConfig?.[field.name]?.colSpan
-  return span ? `grid-column: span ${span}` : undefined
+function resetForm() {
+  reset(form)
 }
 
-async function handleSubmit() {
-  isSubmitting.value = true
-  try {
-    // Validate via standard schema
-    const schema = props.schema as Schema & { '~standard': { validate: (data: unknown) => Promise<{ value?: unknown, issues?: unknown[] }> } }
-    const raw = {
-      ...Object.fromEntries(Object.entries(fieldStores).map(([name, store]) => [name, toRaw(store.input)])),
-      ...Object.fromEntries(Object.entries(jsonFieldRefs).map(([name, r]) => [name, toRaw(r.value)])),
-    }
-    const result = await schema['~standard'].validate(raw)
-    if (result.issues && result.issues.length > 0) {
-      const errors: Record<string, string> = {}
-      for (const issue of result.issues as Array<{ path?: Array<{ key: string }>, message: string }>) {
-        const path = issue.path?.map(p => p.key).join('.') || 'unknown'
-        errors[path] = issue.message
-      }
-      emit('error', errors)
-    }
-    else {
-      emit('submit', (result as { value: unknown }).value as Record<string, unknown>)
-    }
-  }
-  catch (err) {
-    emit('error', { _form: err instanceof Error ? err.message : 'Validation failed' })
-  }
-  finally {
-    isSubmitting.value = false
-  }
+async function submit(output: v.InferOutput<TSchema>, event: SubmitEvent) {
+  await onSubmit?.(output, event)
 }
+
+defineExpose({ form })
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit">
-    <div :class="slots.root">
-      <template
-        v-for="[sectionName, sectionFields] in sections"
-        :key="sectionName"
+  <Form
+    :of="form"
+    :class="ui.root"
+    @submit="submit"
+  >
+    <div
+      v-for="section in sections"
+      :key="section.title"
+      :class="ui.section"
+    >
+      <h3
+        v-if="section.title"
+        :class="ui.sectionTitle"
       >
-        <slot
-          :name="`section:${sectionName}`"
-          :fields="sectionFields"
-        >
-          <div :class="slots.section">
-            <h3
-              v-if="sectionName"
-              :class="slots.sectionTitle"
-            >
-              {{ sectionName }}
-            </h3>
-            <div :class="slots.grid">
-              <template
-                v-for="field in sectionFields"
-                :key="field.name"
-              >
-                <slot
-                  :name="`field:${field.name}`"
-                  :field="field"
-                  :store="fieldStores[field.name]"
-                >
-                  <!-- Nested object -->
-                  <AutoFormObject
-                    v-if="field.type === 'object' && field.children"
-                    :field="field"
-                    :model-value="(getFieldValue(field.name) as Record<string, unknown>) || {}"
-                    :errors="flatErrors"
-                    :disabled="disabled"
-                    :field-config="fieldConfig"
-                    :columns="columns"
-                    :style="colSpanStyle(field)"
-                    @update:model-value="setFieldValue(field.name, $event)"
-                  />
+        {{ section.title }}
+      </h3>
+      <div :class="ui.grid">
+        <AutoFormField
+          v-for="field in section.fields"
+          :key="field.key"
+          :field
+          :path="[field.name]"
+          :style="colSpan(field.colSpan)"
+        />
+      </div>
+    </div>
 
-                  <!-- Array -->
-                  <AutoFormArray
-                    v-else-if="field.type === 'array' && field.itemSchema"
-                    :field="field"
-                    :model-value="(getFieldValue(field.name) as unknown[]) || []"
-                    :errors="flatErrors"
-                    :disabled="disabled"
-                    :field-config="fieldConfig"
-                    :columns="columns"
-                    :style="colSpanStyle(field)"
-                    @update:model-value="setFieldValue(field.name, $event)"
-                  />
+    <p
+      v-if="form.errors"
+      :class="ui.error"
+    >
+      {{ form.errors[0] }}
+    </p>
 
-                  <!-- Leaf field -->
-                  <AutoFormField
-                    v-else
-                    :field="field"
-                    :model-value="getFieldValue(field.name)"
-                    :error="flatErrors[field.name]"
-                    :disabled="disabled"
-                    :field-config="fieldConfig?.[field.name]"
-                    :style="colSpanStyle(field)"
-                    @update:model-value="setFieldValue(field.name, $event)"
-                  />
-                </slot>
-              </template>
-            </div>
-          </div>
-        </slot>
-      </template>
-
+    <div :class="ui.actions">
       <slot
         name="actions"
-        :is-dirty="isDirty"
-        :is-submitting="isSubmitting"
-        :reset="reset"
-      />
+        :form
+        :reset="resetForm"
+      >
+        <UButton
+          type="submit"
+          :loading="form.isSubmitting"
+          :disabled
+        >
+          Submit
+        </UButton>
+      </slot>
     </div>
-  </form>
+  </Form>
 </template>

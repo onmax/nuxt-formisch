@@ -3,10 +3,10 @@
   "name": "auto-form-fixture",
   "type": "module",
   "dependencies": {
-    "nuxt": "catalog:frontend",
-    "valibot": "catalog:inlined"
+    "nuxt": "catalog:nuxt",
+    "valibot": "catalog:nuxt"
   },
   "devDependencies": {
-    "@nuxt/ui": "catalog:ui"
+    "@nuxt/ui": "catalog:nuxt"
   }
 }

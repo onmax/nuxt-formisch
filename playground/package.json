@@ -1,25 +1,15 @@
 {
-  "private": true,
-  "name": "my-module-playground",
+  "name": "nuxt-formisch-playground",
   "type": "module",
+  "private": true,
   "scripts": {
     "dev": "nuxi dev",
-    "build": "nuxi build",
-    "generate": "nuxi generate",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "build": "nuxi build"
   },
   "dependencies": {
-    "nuxt": "catalog:frontend",
-    "valibot": "catalog:inlined"
-  },
-  "devDependencies": {
-    "@nuxt/test-utils": "catalog:test",
-    "@nuxt/ui": "catalog:ui",
-    "@playwright/test": "catalog:test",
-    "@vue/test-utils": "catalog:test",
-    "happy-dom": "catalog:test",
-    "playwright-core": "catalog:test",
-    "vitest": "catalog:test"
+    "@nuxt/ui": "catalog:nuxt",
+    "nuxt": "catalog:nuxt",
+    "tailwindcss": "catalog:nuxt",
+    "valibot": "catalog:nuxt"
   }
 }

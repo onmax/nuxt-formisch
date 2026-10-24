@@ -3,24 +3,39 @@ name: ci
 on:
   push:
     branches: [main]
-    tags: ['v*']
   pull_request:
     branches: [main]
+  # release.yml reuses these checks
+  workflow_call:
+    inputs:
+      ref:
+        description: Git ref to verify
+        required: false
+        type: string
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.number || inputs.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 jobs:
   ci:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 22
-          cache: pnpm
-
-      - run: pnpm install
-      - run: pnpm dev:prepare
+          persist-credentials: false
+          ref: ${{ inputs.ref || github.sha }}
+      - uses: ./.github/actions/setup-pnpm
       - run: pnpm lint
-      - run: pnpm test:types
-      - run: pnpm exec playwright install --with-deps chromium
+      # Generates .nuxt types for the module and the playground
+      - run: pnpm dev:prepare
+      - run: pnpm typecheck
+      - run: pnpm check:doctor
+      - run: pnpm exec playwright-core install --with-deps chromium
       - run: pnpm test
+      # Builds dist and checks the packed package with publint
+      - run: pnpm validate
