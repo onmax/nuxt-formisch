@@ -10,10 +10,10 @@
 <p align="center">Type-safe, headless forms for Nuxt with Formisch and Valibot, plus an optional Nuxt UI AutoForm.</p>
 
 <p align="center">
-  <a href="https://npmx.dev/package/nuxt-formisch"><img src="https://npmx.dev/api/registry/badge/version/nuxt-formisch" alt="nuxt-formisch version"></a>
-  <a href="https://npmx.dev/package/nuxt-formisch"><img src="https://npmx.dev/api/registry/badge/downloads/nuxt-formisch" alt="nuxt-formisch downloads"></a>
-  <a href="https://nuxt-formisch.onmax.me"><img src="https://img.shields.io/badge/docs-nuxt--formisch.onmax.me-10b981" alt="Docs"></a>
-  <a href="https://npmx.dev/package/nuxt-formisch"><img src="https://npmx.dev/api/registry/badge/license/nuxt-formisch" alt="License"></a>
+  <a href="https://npmx.dev/package/nuxt-formisch"><img src="https://comark-ui.onmax.me/badge.svg?source=npm-version&amp;package=nuxt-formisch&amp;icon=npm" alt="nuxt-formisch version"></a>
+  <a href="https://npmx.dev/package/nuxt-formisch"><img src="https://comark-ui.onmax.me/badge.svg?source=npm-downloads&amp;package=nuxt-formisch&amp;period=month&amp;icon=npm" alt="nuxt-formisch downloads"></a>
+  <a href="https://nuxt-formisch.onmax.me"><img src="https://comark-ui.onmax.me/badge.svg?label=docs&amp;value=nuxt-formisch.onmax.me" alt="Docs"></a>
+  <a href="https://npmx.dev/package/nuxt-formisch"><img src="https://comark-ui.onmax.me/badge.svg?label=license&amp;value=MIT" alt="License"></a>
 </p>
 
 [Formisch](https://formisch.dev) is a small, schema-based form library: you describe a form with a [Valibot](https://valibot.dev) schema and get typed values, field state and validation. This module auto-imports its composables, components and methods, validates request bodies in server routes with the same schema, and, with [Nuxt UI](https://ui.nuxt.com) installed, renders a whole form from a schema with `<FAutoForm>`.
