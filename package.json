@@ -1,7 +1,7 @@
 {
   "name": "nuxt-formisch",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packageManager": "pnpm@12.15.0",
   "description": "Formisch integration for Nuxt: schema-based, headless forms with Valibot and an optional Nuxt UI AutoForm",
   "author": "onmax",
