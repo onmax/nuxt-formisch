@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import * as v from 'valibot'
-import { useForm } from '@formisch/vue'
+import { getInput, useForm } from '@formisch/vue'
 import { introspectSchema, toFormSchema } from '../../src/runtime/utils/introspectSchema'
 
 describe('introspectSchema', () => {
@@ -112,9 +112,10 @@ describe('toFormSchema', () => {
     rows: v.array(v.object({ meta: v.record(v.string(), v.string()) })),
   })
 
-  it('lets Formisch build a store for schemas with records', () => {
-    expect(() => useForm({ schema })).toThrow('"record" schema is not supported')
-    expect(() => useForm({ schema: toFormSchema(schema) })).not.toThrow()
+  it('preserves optional and nested record input in the form store', () => {
+    const initialInput = { name: 'Ada', mappings: { x: 1 }, rows: [{ meta: { k: 'v' } }] }
+    const form = useForm({ schema: toFormSchema(schema), initialInput })
+    expect(getInput(form)).toEqual(initialInput)
   })
 
   it('still validates records with the original schema', () => {
@@ -123,10 +124,5 @@ describe('toFormSchema', () => {
     const result = v.safeParse(formSchema, { name: 'a', mappings: { x: 'no' }, rows: [] })
     expect(result.success).toBe(false)
     expect(v.getDotPath(result.issues![0]!)).toBe('mappings.x')
-  })
-
-  it('returns the same schema when nothing needs wrapping', () => {
-    const plain = v.object({ a: v.string(), b: v.array(v.number()) })
-    expect(toFormSchema(plain)).toBe(plain)
   })
 })

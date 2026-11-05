@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import * as v from 'valibot'
 import { jsonToValibotSchema } from '../../src/runtime/utils/jsonToValibotSchema'
+import { introspectSchema } from '../../src/runtime/utils/introspectSchema'
 
-type Node = { type: string, entries?: Record<string, Node>, item?: Node, pipe?: { type: string }[] }
+type Node = { type: string, entries?: Record<string, Node>, item?: Node }
 const node = (schema: unknown) => schema as Node
-const actions = (schema: Node | undefined) => schema?.pipe?.map(action => action.type) ?? []
 
 describe('jsonToValibotSchema', () => {
   it('infers primitives', () => {
@@ -15,17 +15,23 @@ describe('jsonToValibotSchema', () => {
   })
 
   it.each([
-    ['ada@example.com', 'email'],
-    ['https://example.com', 'url'],
-    ['2024-01-15', 'iso_date'],
-    ['2024-01-15T10:30:00Z', 'iso_timestamp'],
-  ])('detects the format of %s', (value, action) => {
-    expect(actions(node(jsonToValibotSchema(value)))).toContain(action)
+    ['email', 'ada@example.com', 'grace@example.org', 'not-an-email', 'email'],
+    ['HTTP URL', 'https://example.com', 'http://example.org/path', 'mailto:ada@example.com', 'url'],
+    ['ISO date', '2024-01-15', '2025-12-31', '2024-01-15T10:30:00Z', 'date'],
+    ['ISO timestamp', '2024-01-15T10:30:00Z', '2025-12-31T23:59:59Z', '2024-01-15', 'text'],
+  ])('validates inferred %s strings', (_, sample, valid, invalid, inputType) => {
+    const schema = jsonToValibotSchema(sample)
+    expect(v.parse(schema, sample)).toBe(sample)
+    expect(v.parse(schema, valid)).toBe(valid)
+    expect(v.safeParse(schema, invalid).success).toBe(false)
+    expect(introspectSchema(v.object({ value: schema })).map(field => field.constraints.format ?? 'text')).toEqual([inputType])
   })
 
-  it('keeps other strings plain', () => {
-    expect(actions(node(jsonToValibotSchema('550e8400-e29b-41d4-a716-446655440000')))).toEqual([])
-    expect(actions(node(jsonToValibotSchema('mailto:x')))).toEqual([])
+  it.each(['550e8400-e29b-41d4-a716-446655440000', 'mailto:x'])('keeps %s as a plain string', (sample) => {
+    const schema = jsonToValibotSchema(sample)
+    expect(v.parse(schema, sample)).toBe(sample)
+    expect(v.parse(schema, 'ordinary text')).toBe('ordinary text')
+    expect(v.safeParse(schema, 42).success).toBe(false)
   })
 
   it('infers arrays from their non-null items', () => {
@@ -45,14 +51,15 @@ describe('jsonToValibotSchema', () => {
     expect(v.getTitle(node(schema).entries!.nested!.entries!.deep_key as v.GenericSchema)).toBe('Deep Key')
   })
 
-  it('stops at maxDepth', () => {
-    const schema = node(jsonToValibotSchema({ a: { b: { c: { d: 1 } } } }, { maxDepth: 2 }))
-    expect(schema.entries!.a!.entries!.b!.entries!.c!.type).toBe('any')
+  it('stops validation below maxDepth while checking parent objects', () => {
+    const schema = jsonToValibotSchema({ a: { b: { c: { d: 1 } } } }, { maxDepth: 2 })
+    const relaxed = { a: { b: { c: 'any value' } } }
+    expect(v.parse(schema, relaxed)).toEqual(relaxed)
+    expect(v.safeParse(schema, { a: { b: 42 } }).success).toBe(false)
   })
 
   it('accepts the sample it was inferred from', () => {
     const sample = { email: 'ada@example.com', site: 'https://ada.dev', born: '1815-12-10', at: '2024-01-15T10:30:00Z', tags: ['a'], meta: null, n: 1 }
     expect(v.safeParse(jsonToValibotSchema(sample), sample).success).toBe(true)
-    expect(v.safeParse(jsonToValibotSchema(sample), { ...sample, email: 'nope' }).success).toBe(false)
   })
 })
