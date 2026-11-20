@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import * as v from 'valibot'
 import { getInput, useForm } from '@formisch/vue'
+import { computed, reactive } from 'vue'
+import type { FieldConfig } from '../../src/runtime/utils/introspectSchema'
 import { introspectSchema, toFormSchema } from '../../src/runtime/utils/introspectSchema'
 
 describe('introspectSchema', () => {
@@ -98,6 +100,28 @@ describe('introspectSchema', () => {
     expect(fields[2]).toMatchObject({ label: 'A', description: 'desc' })
     expect(fields[1]!.label).toBe('Bee')
     expect(fields[0]!.fields![0]!.label).toBe('Dee')
+  })
+
+  it('updates when a reactive field override is added, deleted, or re-added', () => {
+    const schema = v.object({ email: v.string() })
+    const config = reactive<Record<string, FieldConfig>>({})
+    const fields = computed(() => introspectSchema(schema, config))
+
+    expect(fields.value[0]?.label).toBe('Email')
+    config.email = { label: 'Work email' }
+    expect(fields.value[0]?.label).toBe('Work email')
+    delete config.email
+    expect(fields.value[0]?.label).toBe('Email')
+    config.email = { label: 'Personal email' }
+    expect(fields.value[0]?.label).toBe('Personal email')
+  })
+
+  it('ignores inherited field overrides', () => {
+    const schema = v.object({ email: v.string() })
+    const config: Record<string, FieldConfig> = {}
+    Object.setPrototypeOf(config, { email: { label: 'Inherited email' } })
+
+    expect(introspectSchema(schema, config)[0]?.label).toBe('Email')
   })
 
   it('throws for non-object schemas', () => {
