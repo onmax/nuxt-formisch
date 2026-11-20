@@ -181,7 +181,8 @@ function resolveField(schema: SchemaNode, name: string, key: string, config: Rec
   }
   // Innermost first so metadata on the outer schema wins.
   for (const level of levels.reverse()) readPipe(level, ui, constraints)
-  if (!isItem) Object.assign(ui, config?.[key])
+  const fieldConfigs = config
+  if (!isItem && fieldConfigs && key in fieldConfigs && Object.hasOwn(fieldConfigs, key)) Object.assign(ui, fieldConfigs[key])
 
   const options = enumOptions(inner)
   const { type: uiType, label, ...rest } = ui

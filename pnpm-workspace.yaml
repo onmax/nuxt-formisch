@@ -1,13 +1,13 @@
 minimumReleaseAgeExcludePrune: true
 minimumReleaseAgeExclude:
-  - vite-doctor@0.1.1
+  - vite-doctor@0.1.4
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
   # newer semver majors carry provenance, 6.x never did; @babel/core (via nuxt) depends on it
   - semver@6.3.1
   # same GitHub OIDC trusted publisher and provenance as 0.1.0, published without staged approval
-  - vite-doctor@0.1.1
+  - vite-doctor@0.1.4
 
 packages:
   - playground
@@ -28,7 +28,7 @@ catalogs:
   lint:
     '@nuxt/eslint-config': ^1.17.0
     eslint: ^10.13.0
-    vite-doctor: ^0.1.1
+    vite-doctor: ^0.1.4
   nuxt:
     '@nuxt/ui': ^4.12.0
     # Nuxt 4 runs on h3 v1; keep this on the major Nuxt ships
