@@ -30,6 +30,7 @@ export default defineNuxtConfig({
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:image', content: ogImage },
       ],
+      script: [{ 'type': 'module', 'async': true, 'src': 'https://console.vitehub.dev/hosted-comments.js', 'data-vitehub-comments': '7d7a24fc-1c18-47de-9571-0150955f01be', 'data-vitehub-repo': 'onmax/nuxt-formisch' }],
     },
   },
 
